@@ -1,4 +1,6 @@
 ---
+import '@fontsource-variable/pixelify-sans';
+
 interface Props {
 	title: string;
 }
@@ -16,7 +18,7 @@ const { title } = Astro.props;
 		<meta name="generator" content={Astro.generator} />
 		<title>{title}</title>
 	</head>
-	<body>
+	<body class="text-cowhite">
 		<slot />
 	</body>
 </html>
@@ -33,18 +35,7 @@ const { title } = Astro.props;
 		);
 	}
 	html {
-		font-family: system-ui, sans-serif;
-		background: #13151a;
-	}
-	code {
-		font-family:
-			Menlo,
-			Monaco,
-			Lucida Console,
-			Liberation Mono,
-			DejaVu Sans Mono,
-			Bitstream Vera Sans Mono,
-			Courier New,
-			monospace;
+		font-family: 'Pixelify Sans Variable', system-ui;
+		background: #07a2ea;
 	}
 </style>
