@@ -1,0 +1,27 @@
+---
+import "../styles/privacy.css"
+---
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<title>Webmarks</title>
+		<link rel="icon" type="image/png" href="/favicon.png" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="view-transition" content="same-origin" />
+		<meta name="generator" content={Astro.generator} />
+		<meta name="og:title" content=`Privacy | Webmarks` />
+		<meta name="og:description" content="Privacy policy of webmarks product" />
+		<meta name="og:type" content="website" />
+		<meta name="og:site_name" content="Privacy | Webmarks" />
+		<meta name="og:locale" content="en_US" />
+		<meta name="og:locale:alternate" content="en_US" />
+		<meta name="twitter:site" content="@ad_rojo" />
+		<meta name="twitter:title" content=`Privacy Webmarks` />
+		<meta name="twitter:description" content="Privacy policy of webmarks product" />
+	</head>
+	<body class="bg-[#F1F0E9] flex justify-center px-4 py-8">
+		<main class="flex flex-col gap-4 w-full max-w-5xl">
+            <slot />
+		</main>
+	</body>
+</html>

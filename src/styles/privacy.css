@@ -1,0 +1,18 @@
+h1 {
+  font-size: 32px;
+}
+
+h2 {
+  font-size: 24px;
+  font-weight: 600;
+}
+
+h3 {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+ul {
+  list-style: disc;
+  padding-left: 16px;
+}
