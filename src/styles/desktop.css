@@ -268,8 +268,9 @@ a { color: inherit; }
   background: var(--ink); color: var(--cream); text-shadow: none;
 }
 
-/* Icons can be picked up (src/scripts/icons.ts). Wide screens: drag one
-   anywhere. Phones: press and hold, they wiggle, drag to reorder. */
+/* Icons can be picked up (src/scripts/icons.ts). Wide screens: drag one and
+   it settles into a hidden grid. Phones: press and hold, they wiggle, drag
+   to reorder. */
 html.js .icons > li { position: relative; }
 html.js .dicon {
   touch-action: none; user-select: none; -webkit-user-select: none;
@@ -282,7 +283,7 @@ html.js .dicon {
 .is-held .appicon:not(.is-sprite) { box-shadow: 6px 6px 0 rgba(47, 40, 35, 0.3); }
 .is-held .dicon-label { background: var(--ink); color: var(--cream); text-shadow: none; }
 
-html.is-arranging .icons > li, html.is-tidying .icons > li { transition: translate 0.18s steps(5); }
+html.is-arranging .icons > li, html.is-settling .icons > li { transition: translate 0.18s steps(5); }
 html .icons > li.is-held { transition: none; }
 html.is-arranging .dicon { cursor: grab; animation: icon-wiggle 0.13s steps(3, jump-none) infinite alternate; }
 html.is-arranging .icons > li:nth-child(even) .dicon { animation-direction: alternate-reverse; animation-duration: 0.15s; }
@@ -545,5 +546,5 @@ html:not(.js) .snowcut { display: none; }
   html.is-arranging .dicon { animation: none; rotate: -2deg; }
   html.is-arranging .icons > li:nth-child(even) .dicon { rotate: 2deg; }
   html.is-arranging .is-held .dicon { rotate: none; }
-  html.is-arranging .icons > li, html.is-tidying .icons > li { transition: none; }
+  html.is-arranging .icons > li, html.is-settling .icons > li { transition: none; }
 }

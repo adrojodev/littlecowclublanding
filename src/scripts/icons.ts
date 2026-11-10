@@ -1,21 +1,37 @@
 // Desktop icons you can move.
 //
-// On a wide screen an icon is dragged anywhere on the wallpaper and stays
-// where it is dropped. On a phone the icons are a home screen: press and
+// On a wide screen an icon is dragged across the wallpaper and settles into
+// the nearest free cell of an invisible grid, the same grid the icons start
+// out on. On a phone the icons are a home screen: press and
 // hold one and they all start to wiggle, then drag to reorder them, as on
 // an iPhone. Both arrangements are remembered in this browser.
 //
-// An icon never leaves its list in the page. A free position is only a
-// `translate` away from the grid cell it already has, so the layout, the
-// tab order and the no-JavaScript page are untouched.
+// An icon never leaves its list in the page. A moved icon is only a
+// `translate` away from the place the layout already gave it, so the
+// layout, the tab order and the no-JavaScript page are untouched.
 
 type Side = 'l' | 'r';
 
-/** Where a freely placed icon sits: its distance from one side, and from the top. */
+/**
+ * A cell of the hidden grid. Columns are counted inwards from one side of
+ * the screen, so icons parked on the right stay on the right when the
+ * window is resized.
+ */
 interface Spot {
   side: Side;
-  x: number;
-  y: number;
+  col: number;
+  row: number;
+}
+
+/** The hidden grid as it fits the window right now. */
+interface Grid {
+  w: number;
+  h: number;
+  top: number;
+  padLeft: number;
+  padRight: number;
+  rows: number;
+  cols: Record<Side, number>;
 }
 
 interface Saved {
@@ -38,7 +54,7 @@ interface Held {
   li: HTMLElement;
   grabX: number;
   grabY: number;
-  /** Free placement (wide screens) rather than reordering (phones). */
+  /** Placed on the grid (wide screens) rather than reordered (phones). */
   free: boolean;
 }
 
@@ -53,16 +69,23 @@ const KEY = 'lcc:icons:v1';
 const HOLD_MS = 450;
 const DRAG_SLOP = 6;
 const HOLD_SLOP = 10;
-const GRID = 4; // one wallpaper pixel
 
 function load(): Saved {
   try {
     const parsed: unknown = JSON.parse(window.localStorage.getItem(KEY) ?? '{}');
-    return parsed && typeof parsed === 'object' ? (parsed as Saved) : {};
+    if (!parsed || typeof parsed !== 'object') return {};
+    const saved = parsed as Saved;
+    // Keep only spots that name a grid cell (an earlier version stored pixels).
+    saved.spots = Object.fromEntries(
+      Object.entries(saved.spots ?? {}).filter(([, s]) => Number.isInteger(s?.col) && Number.isInteger(s?.row)),
+    );
+    return saved;
   } catch {
     return {};
   }
 }
+
+const key = (cell: Spot) => `${cell.side}:${cell.col}:${cell.row}`;
 
 export function initIcons(phone: MediaQueryList): { tidy: () => void } {
   const root = document.documentElement;
@@ -78,6 +101,7 @@ export function initIcons(phone: MediaQueryList): { tidy: () => void } {
   let press: Press | null = null;
   let held: Held | null = null;
   let swallowUntil = 0;
+  let settleTimer = 0;
 
   function save(): void {
     try {
@@ -100,7 +124,72 @@ export function initIcons(phone: MediaQueryList): { tidy: () => void } {
     const top = layer?.getBoundingClientRect().top ?? 0;
     return Math.min(Math.max(y, top), Math.max(top, window.innerHeight - h));
   };
-  const snap = (n: number) => Math.round(n / GRID) * GRID;
+
+  // ---------- the hidden grid ----------------------------------------------
+
+  /**
+   * Cells are the size of an icon and line up with where the two lists
+   * start, so an untouched icon already sits in a cell. The columns are
+   * split between the two sides and never overlap in the middle.
+   */
+  function grid(): Grid {
+    const first = lists[0].getBoundingClientRect();
+    const last = lists[lists.length - 1].getBoundingClientRect();
+    const w = icons[0].offsetWidth;
+    const h = icons[0].offsetHeight;
+    const padLeft = first.left;
+    const padRight = window.innerWidth - last.right;
+    const total = Math.max(2, Math.floor((window.innerWidth - padLeft - padRight) / w));
+    const left = Math.ceil(total / 2);
+    return {
+      w,
+      h,
+      top: first.top,
+      padLeft,
+      padRight,
+      rows: Math.max(1, Math.floor(first.height / h)),
+      cols: { l: left, r: total - left },
+    };
+  }
+
+  function cellBox(cell: Spot, g: Grid): Box {
+    const x = cell.side === 'l' ? g.padLeft + cell.col * g.w : window.innerWidth - g.padRight - (cell.col + 1) * g.w;
+    return { x, y: g.top + cell.row * g.h, w: g.w, h: g.h };
+  }
+
+  /** The free cell closest to a point (the top-left corner of an icon). */
+  function nearestFree(x: number, y: number, g: Grid, taken: Set<string>): Spot {
+    let best: Spot = { side: 'l', col: 0, row: 0 };
+    let bestDistance = Infinity;
+    (['l', 'r'] as const).forEach((side) => {
+      for (let col = 0; col < g.cols[side]; col++) {
+        for (let row = 0; row < g.rows; row++) {
+          const cell = { side, col, row };
+          if (taken.has(key(cell))) continue;
+          const box = cellBox(cell, g);
+          const distance = Math.hypot(box.x - x, box.y - y);
+          if (distance < bestDistance) {
+            best = cell;
+            bestDistance = distance;
+          }
+        }
+      }
+    });
+    return best;
+  }
+
+  /** The cell an icon has from the layout alone. */
+  function homeCell(li: HTMLElement, g: Grid): Spot {
+    const cell = slot(li);
+    return nearestFree(cell.x, cell.y, g, new Set());
+  }
+
+  /** Let moved icons glide, in steps, to where `arrange` puts them. */
+  function settle(): void {
+    root.classList.add('is-settling');
+    window.clearTimeout(settleTimer);
+    settleTimer = window.setTimeout(() => root.classList.remove('is-settling'), 300);
+  }
 
   // ---------- applying what was saved --------------------------------------
 
@@ -119,19 +208,31 @@ export function initIcons(phone: MediaQueryList): { tidy: () => void } {
     if (lists.some((ul) => ul.children.length === 0)) restoreOriginalOrder();
   }
 
-  /** Put freely placed icons where they were left; on phones nothing is free. */
+  /** Put moved icons in their grid cells; on phones nothing is moved. */
   function arrange(): void {
-    icons.forEach((li) => {
-      if (li === held?.li) return;
-      const spot = phone.matches ? undefined : saved.spots?.[li.dataset.icon ?? ''];
-      if (!spot) {
-        li.style.translate = '';
-        return;
-      }
-      const cell = slot(li);
-      const left = clampX(spot.side === 'l' ? spot.x : window.innerWidth - spot.x - cell.w, cell.w);
-      const top = clampY(spot.y, cell.h);
-      li.style.translate = `${Math.round(left - cell.x)}px ${Math.round(top - cell.y)}px`;
+    const resting = icons.filter((li) => li !== held?.li);
+    const spotOf = (li: HTMLElement) => (phone.matches ? undefined : saved.spots?.[li.dataset.icon ?? '']);
+    const moved = resting.filter(spotOf);
+    const taken = new Set<string>();
+
+    // Icons nobody moved keep the cell the layout gives them.
+    const g = phone.matches ? null : grid();
+    resting.forEach((li) => {
+      if (spotOf(li)) return;
+      li.style.translate = '';
+      if (g) taken.add(key(homeCell(li, g)));
+    });
+    if (!g) return;
+
+    // A moved icon gets its saved cell, or the nearest free one if the
+    // window is now too small for it or the cell has been filled.
+    moved.forEach((li) => {
+      const want = cellBox(spotOf(li)!, g);
+      const cell = nearestFree(want.x, want.y, g, taken);
+      taken.add(key(cell));
+      const box = cellBox(cell, g);
+      const from = slot(li);
+      li.style.translate = `${Math.round(box.x - from.x)}px ${Math.round(box.y - from.y)}px`;
     });
   }
 
@@ -237,14 +338,25 @@ export function initIcons(phone: MediaQueryList): { tidy: () => void } {
     swallowUntil = performance.now() + 400;
 
     if (free) {
-      const r = li.getBoundingClientRect();
-      const left = clampX(snap(r.left), r.width);
-      const top = clampY(snap(r.top), r.height);
-      const side: Side = left + r.width / 2 < window.innerWidth / 2 ? 'l' : 'r';
-      saved.spots = {
-        ...saved.spots,
-        [li.dataset.icon ?? '']: { side, x: side === 'l' ? left : window.innerWidth - left - r.width, y: top },
-      };
+      // Settle into the nearest cell no other icon is using.
+      const g = grid();
+      const dropped = li.getBoundingClientRect();
+      const taken = new Set(
+        icons
+          .filter((other) => other !== li)
+          .map((other) => {
+            const r = other.getBoundingClientRect();
+            return key(nearestFree(r.left, r.top, g, new Set()));
+          }),
+      );
+      const cell = nearestFree(dropped.left, dropped.top, g, taken);
+      const id = li.dataset.icon ?? '';
+      const spots = { ...saved.spots };
+      // Back where the layout would put it anyway: nothing to remember.
+      if (key(cell) === key(homeCell(li, g))) delete spots[id];
+      else spots[id] = cell;
+      saved.spots = spots;
+      settle();
       arrange();
     } else {
       li.style.translate = ''; // glides into its cell
@@ -363,9 +475,8 @@ export function initIcons(phone: MediaQueryList): { tidy: () => void } {
       } catch {
         // Nothing was stored, so there is nothing to forget.
       }
-      root.classList.add('is-tidying');
+      settle();
       flip(restoreOriginalOrder);
-      window.setTimeout(() => root.classList.remove('is-tidying'), 300);
     },
   };
 }
