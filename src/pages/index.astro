@@ -7,11 +7,10 @@ import AppIcon from '../components/desktop/AppIcon.astro';
 import PixelArt from '../components/desktop/PixelArt.astro';
 import Snowcut from '../components/desktop/Snowcut.astro';
 import { projects, snowcut, contact } from '../data/projects';
-import rojo from '../assets/rojo.png';
 
 const herdCount = projects.length + 1;
 const description =
-	'Little Cow Club is where Rojo makes small, friendly software: Mini Briefs, Dine, Happy Places, Keep it short and a paper snowflake maker you can use right here.';
+	'Little Cow Club is a very small software company. We make Mini Briefs, Dine, Happy Places, Keep it short and a paper snowflake maker you can use right here.';
 ---
 
 <Layout title="Little Cow Club — Moooooooooooooooooooo" description={description}>
@@ -151,9 +150,9 @@ const description =
 			<div class="doc">
 				<div class="home-hero">
 					<div>
-						<span class="eyebrow">A very small software club</span>
+						<span class="eyebrow">A very small software company</span>
 						<h1 class="home-title">Little Cow <span>Club</span></h1>
-						<p class="home-lede">Where Rojo makes small, friendly software. Some of it is for the news, some for money, and one of them cuts snowflakes.</p>
+						<p class="home-lede">We make small, friendly software. Some of it is for the news, some for money, and one of them cuts snowflakes.</p>
 						<div class="actions">
 							<a class="btn" href="#contact" data-open="contact">Contact us!</a>
 							<a class="btn btn-quiet" href="#about" data-open="about">About the club</a>
@@ -198,8 +197,8 @@ const description =
 				<hr class="rule" />
 
 				<div class="home-foot">
-					<span>© {new Date().getFullYear()} Little Cow Club · Mexico City</span>
-					<a class="textlink" href={contact.portfolio} target="_blank" rel="noopener">Rojo’s portfolio</a>
+					<span>© {new Date().getFullYear()} Little Cow Club</span>
+					<a class="textlink" href="#contact" data-open="contact">Say moo</a>
 				</div>
 			</div>
 		</Window>
@@ -277,26 +276,24 @@ const description =
 			</noscript>
 		</Window>
 
-		<Window id="about" title="About" width={600} height={590}>
+		<Window id="about" title="About" width={600} height={540}>
 			<AppIcon slot="icon" sprite="cowface" />
 			<div class="doc">
 				<div class="desk">
-					<div class="desk-photo"><Image src={rojo} alt="Rojo’s Memoji, blowing a party horn" width={440} loading="lazy" /></div>
+					<div class="desk-mark"><AppIcon sprite="cowface" /></div>
 					<div>
-						<span class="eyebrow">From the desk of</span>
-						<h2 class="desk-name">Rojo</h2>
-						<p class="desk-role">Software engineer &amp; product designer</p>
+						<span class="eyebrow">About the club</span>
+						<h2 class="desk-name">Little Cow Club</h2>
+						<p class="desk-role">A very small software company</p>
 					</div>
 				</div>
 				<hr class="rule" />
-				<p>Little Cow Club is the name on the door of the apps I make on my own. They give me room to explore ideas and experiment.</p>
-				<p>I set the product direction, work with AI coding agents on design and implementation, and keep reviewing and refining the result until it feels worth using.</p>
-				<p>I love a good interface: the typography, the interactions, and the small decisions that make a product feel right.</p>
+				<p>We make small apps and look after them. Each one does a single job and tries to be pleasant while doing it.</p>
+				<p>We care about a good interface: the typography, the interactions, and the small decisions that make a product feel right.</p>
+				<p>We set the product direction, work with AI coding agents on design and implementation, and keep reviewing and refining until the result feels worth using.</p>
 				<ul class="linklist">
-					<li><a class="btn" href={contact.portfolio} target="_blank" rel="noopener">See my portfolio</a></li>
-					<li><a class="btn btn-quiet" href={contact.github} target="_blank" rel="noopener">GitHub</a></li>
-					<li><a class="btn btn-quiet" href={contact.linkedin} target="_blank" rel="noopener">LinkedIn</a></li>
-					<li><a class="btn btn-quiet" href={contact.instagram} target="_blank" rel="noopener">Instagram</a></li>
+					<li><a class="btn" href="#contact" data-open="contact">Contact us!</a></li>
+					<li><a class="btn btn-quiet" href="#home" data-open="home">See the herd</a></li>
 				</ul>
 			</div>
 		</Window>

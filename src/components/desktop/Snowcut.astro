@@ -1,7 +1,6 @@
 ---
 // Snowcut — the paper snowflake maker — running live inside its window.
 // Markup mirrors the standalone app; behaviour lives in src/apps/snowcut.
-import '@fontsource-variable/archivo';
 ---
 
 <div class="snowcut" data-snowcut>
@@ -126,8 +125,9 @@ import '@fontsource-variable/archivo';
 </div>
 
 <style is:global>
-  /* Snowcut keeps its own identity inside the window: Archivo, flat
-     primaries, 2px ink rules. Everything is prefixed so it stays put. */
+  /* Snowcut keeps its own colours inside the window (flat primaries, 2px
+     ink rules) but speaks in the desktop's pixel face. Everything is
+     prefixed so it stays put. */
   .snowcut {
     --sc-ink: #1a1c20;
     --sc-muted: #6a6e76;
@@ -138,7 +138,7 @@ import '@fontsource-variable/archivo';
     container: snowcut / size;
     height: 100%;
     min-height: 520px;
-    font-family: 'Archivo Variable', 'Helvetica Neue', Arial, sans-serif;
+    font-family: var(--font-pixel);
     color: var(--sc-ink);
     background: #fff;
   }
@@ -158,23 +158,23 @@ import '@fontsource-variable/archivo';
     width: 36px; height: 36px; background: var(--sc-red); border-radius: 8px;
     display: flex; align-items: center; justify-content: center;
   }
-  .sc-brand-name { font-size: 20px; font-weight: 900; letter-spacing: 0.04em; }
+  .sc-brand-name { font-size: 20px; font-weight: 700; letter-spacing: 0.04em; }
   .sc-topbar-actions { display: flex; align-items: center; gap: 10px; }
 
   .sc-paper {
     display: flex; align-items: center; gap: 8px;
     border: 2px solid var(--sc-ink); border-radius: 8px;
-    padding: 6px 10px; font-size: 13px; font-weight: 700;
+    padding: 6px 10px; font-size: 15px; font-weight: 700;
   }
   .sc-paper select {
-    font: inherit; font-weight: 900; border: none; background: none;
+    font: inherit; font-weight: 700; border: none; background: none;
     color: var(--sc-ink); cursor: pointer; padding: 0 2px;
   }
 
   .sc-btn {
     display: inline-flex; align-items: center; justify-content: center; gap: 10px;
     border: none; border-radius: 8px; padding: 11px 18px;
-    font-size: 14px; font-weight: 900; letter-spacing: 0.03em; white-space: nowrap;
+    font-size: 16px; font-weight: 700; letter-spacing: 0.03em; white-space: nowrap;
     cursor: pointer; color: var(--sc-ink);
     transition: transform 0.06s ease, filter 0.12s ease;
   }
@@ -194,7 +194,7 @@ import '@fontsource-variable/archivo';
     display: flex; flex-direction: column; justify-content: space-between;
   }
   .sc-panel-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-  .sc-panel-label { margin: 0; font-size: 12px; font-weight: 900; letter-spacing: 0.12em; color: var(--sc-muted); }
+  .sc-panel-label { margin: 0; font-size: 14px; font-weight: 700; letter-spacing: 0.12em; color: var(--sc-muted); }
 
   .sc-tools { display: flex; gap: 8px; }
   .sc-tool {
@@ -218,15 +218,15 @@ import '@fontsource-variable/archivo';
   .sc-editor.erase-mode .sc-shape:hover { fill: #8f0b0d; }
 
   .sc-pattern-actions { display: flex; align-items: center; gap: 12px; margin-top: 14px; flex-wrap: wrap; min-height: 44px; }
-  .sc-hint { font-size: 13px; font-weight: 500; color: var(--sc-muted); margin: 0; line-height: 1.35; }
+  .sc-hint { font-size: 15px; font-weight: 500; color: var(--sc-muted); margin: 0; line-height: 1.35; }
 
   .sc-preview-box {
     background: var(--sc-blue); padding: 20px;
     display: flex; align-items: center; justify-content: center;
   }
   .sc-preview-hidden { display: flex; flex-direction: column; align-items: center; gap: 10px; color: #fff; text-align: center; }
-  .sc-preview-hidden .sc-q { font-size: 34px; font-weight: 900; line-height: 1; }
-  .sc-preview-hidden p { font-size: 14px; font-weight: 700; margin: 0; max-width: 220px; line-height: 1.35; }
+  .sc-preview-hidden .sc-q { font-size: 34px; font-weight: 700; line-height: 1; }
+  .sc-preview-hidden p { font-size: 16px; font-weight: 700; margin: 0; max-width: 220px; line-height: 1.35; }
   .sc-preview-svg { width: 100%; max-width: 300px; height: auto; }
   .sc-preview-svg.is-hidden, .sc-preview-hidden.is-hidden { display: none; }
   .sc-preview-hint { margin-top: 14px; min-height: 44px; display: flex; align-items: center; }
@@ -234,20 +234,20 @@ import '@fontsource-variable/archivo';
   .sc-toggle { display: flex; border: 2px solid var(--sc-ink); border-radius: 8px; overflow: hidden; }
   .sc-toggle-btn {
     border: none; background: #fff; color: var(--sc-ink); cursor: pointer;
-    font-size: 12px; font-weight: 900; letter-spacing: 0.04em; padding: 7px 13px;
+    font-size: 14px; font-weight: 700; letter-spacing: 0.04em; padding: 7px 13px;
   }
   .sc-toggle-btn.active { background: var(--sc-ink); color: #fff; }
 
   .sc-steps { display: flex; flex-shrink: 0; border-top: 2px solid var(--sc-ink); }
   .sc-step {
     flex: 1 1 0; display: flex; align-items: center; gap: 10px;
-    padding: 14px 22px; font-size: 13px; font-weight: 700; line-height: 1.25;
+    padding: 14px 22px; font-size: 15px; font-weight: 700; line-height: 1.25;
     border-right: 2px solid var(--sc-ink);
   }
   .sc-step:last-child { border-right: none; }
   .sc-step-n {
     width: 26px; height: 26px; border-radius: 6px; color: #fff; flex-shrink: 0;
-    display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 900;
+    display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700;
   }
   .sc-n-red { background: var(--sc-red); }
   .sc-n-yellow { background: var(--sc-yellow); color: var(--sc-ink); }
@@ -263,10 +263,10 @@ import '@fontsource-variable/archivo';
   .sc-modal-icon {
     width: 64px; height: 64px; background: var(--sc-blue); border-radius: 14px; color: #fff;
     display: flex; align-items: center; justify-content: center;
-    font-size: 34px; font-weight: 900; margin: 0 auto 16px;
+    font-size: 34px; font-weight: 700; margin: 0 auto 16px;
   }
-  .sc-modal h3 { font-size: 26px; font-weight: 900; margin: 0 0 12px; line-height: 1.15; }
-  .sc-modal p { font-size: 15px; font-weight: 500; color: #4a4e56; line-height: 1.5; margin: 0 auto 20px; max-width: 330px; }
+  .sc-modal h3 { font-size: 26px; font-weight: 700; margin: 0 0 12px; line-height: 1.15; }
+  .sc-modal p { font-size: 17px; font-weight: 500; color: #4a4e56; line-height: 1.5; margin: 0 auto 20px; max-width: 330px; }
   .sc-modal-actions { display: flex; flex-direction: column; gap: 10px; }
   .sc-modal-actions .sc-btn { width: 100%; }
 
@@ -276,7 +276,7 @@ import '@fontsource-variable/archivo';
     .sc-topbar { padding: 0 14px; }
     .sc-topbar-actions { gap: 8px; }
     .sc-brand-name { display: none; }
-    .sc-btn { padding: 11px 13px; font-size: 13px; gap: 8px; }
+    .sc-btn { padding: 11px 13px; font-size: 15px; gap: 8px; }
     .sc-workspace { flex-direction: column; flex: none; }
     .sc-panel { flex: none; padding: 16px 14px; }
     .sc-panel-pattern { border-right: none; border-bottom: 2px solid var(--sc-ink); }
@@ -287,9 +287,9 @@ import '@fontsource-variable/archivo';
     .sc-step:nth-child(2n) { border-right: none; }
   }
   @container snowcut (max-width: 440px) {
-    .sc-paper { padding: 6px 8px; font-size: 12px; }
+    .sc-paper { padding: 6px 8px; font-size: 14px; }
     .sc-paper [data-i18n='paperLabel'] { display: none; }
-    .sc-topbar .sc-btn { padding: 10px; font-size: 12px; gap: 6px; }
-    .sc-lang .sc-toggle-btn { padding: 7px 9px; font-size: 11px; }
+    .sc-topbar .sc-btn { padding: 10px; font-size: 14px; gap: 6px; }
+    .sc-lang .sc-toggle-btn { padding: 7px 9px; font-size: 13px; }
   }
 </style>

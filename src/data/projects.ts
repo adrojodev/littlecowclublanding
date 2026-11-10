@@ -99,7 +99,6 @@ export const projects: Project[] = [
     ],
     links: [
       { label: 'App Store', href: 'https://apps.apple.com/us/app/dine/id6799501885' },
-      { label: 'Visit the site', href: 'https://adrojodev.github.io/dine-site/' },
     ],
     icon: { src: dineIcon },
     shots: [
@@ -131,7 +130,6 @@ export const projects: Project[] = [
     ],
     links: [
       { label: 'App Store', href: 'https://apps.apple.com/app/happy-places-ive-been/id6478132857' },
-      { label: 'Source on GitHub', href: 'https://github.com/adrojodev/Happy-Places' },
     ],
     icon: { src: happyPlacesIcon },
     shots: [
@@ -150,7 +148,6 @@ export const projects: Project[] = [
     status: 'Still running',
     about: [
       'Keep it short answers one question: should you wear shorts today? It reads the forecast where you are and lets an AI make the call.',
-      'Made with Jules.',
     ],
     features: [
       'Uses the forecast for your location',
@@ -160,7 +157,6 @@ export const projects: Project[] = [
     ],
     links: [
       { label: 'Open keepitshort.xyz', href: 'https://www.keepitshort.xyz/' },
-      { label: 'Source on GitHub', href: 'https://github.com/adrojodev/Keep-it-short' },
     ],
     icon: { src: keepItShortIcon, tile: '#ffffff' },
     shots: [{ src: keepItShortShare, alt: 'Keep it short artwork' }],
@@ -178,8 +174,4 @@ export const snowcut = {
 
 export const contact = {
   email: 'ad_rojo@outlook.com',
-  portfolio: 'https://www.adrojo.com/',
-  github: 'https://github.com/adrojodev',
-  linkedin: 'https://www.linkedin.com/in/david-hernández-45690112a',
-  instagram: 'https://www.instagram.com/ad_rojo/',
 };

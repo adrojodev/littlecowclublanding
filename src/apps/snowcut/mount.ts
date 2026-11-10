@@ -1,5 +1,5 @@
 // Snowcut, running inside a Little Cow Club window.
-// Ported from the standalone app (adrojodev/snowflakes): same behaviour,
+// Ported from the standalone Snowcut app: same behaviour,
 // but every lookup is scoped to the window's root element instead of the
 // document, so the app never touches the page around it.
 

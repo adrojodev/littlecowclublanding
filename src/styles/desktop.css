@@ -1,8 +1,8 @@
 /* ==========================================================================
    Little Cow Club — the desktop
-   A pixel pasture with real windows on it. Chrome is drawn in the cow's own
-   colours (cream hide, brown spots, red collar, gold bell); window contents
-   read in Work Sans so the copy stays comfortable.
+   A pixel pasture with real windows on it, drawn in the cow's own colours
+   (cream hide, brown spots, red collar, gold bell). Every word is set in
+   Pixelify Sans; running text is a size up so it stays comfortable.
    ========================================================================== */
 
 :root {
@@ -28,7 +28,7 @@
   --udder: #efcbda;
 
   --font-pixel: 'Pixelify Sans Variable', 'Pixelify Sans', ui-monospace, monospace;
-  --font-body: 'Work Sans Variable', 'Work Sans', system-ui, sans-serif;
+  --font-body: var(--font-pixel);
 
   --bar-h: 44px;
   --bar-gap: 8px;
@@ -208,7 +208,7 @@ a { color: inherit; }
 }
 .menu-row:hover, .menu-row:focus-visible { background: var(--ink); color: var(--cream); outline: none; }
 .menu-row small {
-  display: block; margin-top: 3px; font: 450 13px/1.25 var(--font-body); color: var(--muted);
+  display: block; margin-top: 3px; font: 400 15px/1.2 var(--font-body); color: var(--muted);
 }
 .menu-row:hover small, .menu-row:focus-visible small { color: var(--tin); }
 .menu-sep { height: 3px; margin: 4px 0; border: 0; background: var(--line); }
@@ -343,7 +343,7 @@ body.is-dragging .win-body { pointer-events: none; }
 
 /* ---------- window content: shared type ---------------------------------- */
 
-.doc { padding: 28px 32px 32px; font: 450 16px/1.6 var(--font-body); }
+.doc { padding: 28px 32px 32px; font: 400 18px/1.45 var(--font-body); }
 .doc p { margin: 0 0 12px; max-width: 62ch; }
 .doc p:last-child { margin-bottom: 0; }
 .doc h1, .doc h2, .doc h3 { margin: 0; font-family: var(--font-pixel); line-height: 1; text-wrap: balance; }
@@ -367,7 +367,7 @@ body.is-dragging .win-body { pointer-events: none; }
 .home-hero { display: grid; grid-template-columns: minmax(0, 1fr) 248px; gap: 32px; align-items: center; }
 .home-title { font-size: clamp(56px, 12cqw, 92px); font-weight: 700; letter-spacing: -0.01em; }
 .home-title span { display: block; font-size: 0.62em; color: var(--cown); margin-top: 0.06em; }
-.home-lede { margin: 18px 0 22px !important; font-size: 18px; max-width: 34ch !important; }
+.home-lede { margin: 18px 0 22px !important; font-size: 20px; max-width: 32ch !important; }
 
 .scene {
   position: relative; aspect-ratio: 5 / 4; overflow: hidden;
@@ -394,7 +394,7 @@ body.is-dragging .win-body { pointer-events: none; }
 .herd-card:hover .dicon-art { transform: none; }
 .herd-name { display: flex; align-items: center; gap: 8px; font: 600 21px/1 var(--font-pixel); }
 .herd-name .chip { font-size: 13px; padding: 2px 6px 3px; }
-.herd-short { font-size: 14.5px; line-height: 1.35; color: var(--muted); }
+.herd-short { font-size: 16px; line-height: 1.25; color: var(--muted); }
 .home-foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 16px; font: 500 15px/1.2 var(--font-pixel); color: var(--muted); }
 
 /* ---------- project windows ---------------------------------------------- */
@@ -404,17 +404,17 @@ body.is-dragging .win-body { pointer-events: none; }
 .proj-head .dicon-art { width: 76px; height: 76px; flex-shrink: 0; }
 .proj-head .dicon-art .appicon { box-shadow: 4px 4px 0 rgba(47, 40, 35, 0.3); }
 .proj-name { font-size: 44px; font-weight: 700; }
-.proj-tagline { margin: 8px 0 0 !important; font-size: 18px; line-height: 1.3; color: var(--cown); font-weight: 550; }
+.proj-tagline { margin: 8px 0 0 !important; font-size: 20px; line-height: 1.2; color: var(--cown); font-weight: 500; }
 .proj .chips { margin-bottom: 20px; }
 .proj .actions { margin-bottom: 26px; }
 .proj h3 { font-size: 20px; font-weight: 600; margin: 22px 0 10px; color: var(--cown); }
 .ticks { margin: 0; padding: 0; list-style: none; display: grid; gap: 7px; }
-.ticks li { position: relative; padding-left: 22px; line-height: 1.45; }
+.ticks li { position: relative; padding-left: 22px; line-height: 1.3; }
 .ticks li::before {
   content: ''; position: absolute; left: 0; top: 0.42em; width: 10px; height: 10px; background: var(--moored);
   clip-path: polygon(0 40%, 20% 40%, 20% 60%, 40% 60%, 40% 80%, 60% 80%, 60% 60%, 80% 60%, 80% 40%, 100% 40%, 100% 20%, 80% 20%, 80% 0, 60% 0, 60% 20%, 40% 20%, 40% 40%, 20% 40%, 20% 20%, 0 20%);
 }
-.proj-note { margin-top: 12px !important; font-size: 13.5px; color: var(--muted); }
+.proj-note { margin-top: 12px !important; font-size: 15px; line-height: 1.25; color: var(--muted); }
 
 .shots { position: sticky; top: 28px; }
 .shots-track {
@@ -437,23 +437,22 @@ html:not(.js) .shots-nav { display: none; }
 /* ---------- about / contact / trash -------------------------------------- */
 
 .desk { display: flex; align-items: center; gap: 16px; }
-.desk-photo { width: 84px; height: 84px; flex-shrink: 0; overflow: hidden; border: 3px solid var(--ink); box-shadow: 4px 4px 0 rgba(47, 40, 35, 0.3); background: var(--bell); }
-.desk-photo img { display: block; width: 100%; height: 100%; object-fit: cover; transform: scale(2.6); transform-origin: 50% 47%; }
+.desk-mark { width: 80px; height: 80px; flex-shrink: 0; }
 .desk-name { font: 700 34px/1 var(--font-pixel); }
-.desk-role { margin-top: 6px; font-size: 15px; color: var(--muted); }
+.desk-role { margin-top: 6px; font-size: 17px; color: var(--muted); }
 .linklist { display: flex; flex-wrap: wrap; gap: 10px 12px; margin: 20px 0 0; padding: 0 0 6px; list-style: none; }
 
 .mail { display: grid; gap: 0; }
 .mail-row { display: grid; grid-template-columns: 76px minmax(0, 1fr); align-items: center; border-bottom: 3px solid var(--line); }
 .mail-row label, .mail-row .mail-key { padding: 0 0 0 2px; font: 500 16px/1 var(--font-pixel); color: var(--muted); }
-.mail-row input, .mail-static { width: 100%; padding: 12px 4px; border: 0; background: none; color: var(--ink); font: 500 16px/1.3 var(--font-body); }
+.mail-row input, .mail-static { width: 100%; padding: 12px 4px; border: 0; background: none; color: var(--ink); font: 500 18px/1.3 var(--font-body); }
 .mail textarea {
   width: 100%; min-height: 150px; margin: 14px 0 18px; padding: 12px 14px; resize: vertical;
-  color: var(--ink); background: #fff; border: 3px solid var(--line); font: 450 16px/1.5 var(--font-body);
+  color: var(--ink); background: #fff; border: 3px solid var(--line); font: 400 18px/1.4 var(--font-body);
 }
 .mail :is(input, textarea):focus-visible { outline-offset: 0; }
 .mail textarea:focus { border-color: var(--ink); }
-.mail-hint { margin-top: 14px !important; font-size: 13.5px; color: var(--muted); }
+.mail-hint { margin-top: 14px !important; font-size: 15px; line-height: 1.25; color: var(--muted); }
 
 .empty { display: grid; justify-items: center; gap: 14px; padding: 36px 24px 40px; text-align: center; }
 .empty .appicon { width: 72px; height: 72px; }
