@@ -13,6 +13,8 @@ import happyPlaces1 from '../assets/projects/happy-places-1.jpg';
 import happyPlaces2 from '../assets/projects/happy-places-2.jpg';
 import keepItShortIcon from '../assets/projects/keep-it-short-icon.png';
 import keepItShortShare from '../assets/projects/keep-it-short-share.png';
+import webmarkIcon from '../assets/projects/webmark-icon.png';
+import webmarkLine from '../assets/projects/webmark-line.png';
 
 export interface ProjectLink {
   label: string;
@@ -160,6 +162,32 @@ export const projects: Project[] = [
     ],
     icon: { src: keepItShortIcon, tile: '#ffffff' },
     shots: [{ src: keepItShortShare, alt: 'Keep it short artwork' }],
+    shotShape: 'wide',
+  },
+  {
+    id: 'webmark',
+    name: 'Webmark',
+    tagline: 'Save your place on any page.',
+    short: 'A bookmark for where you stopped reading.',
+    platform: 'Chrome',
+    year: '2025',
+    status: 'Live on the Chrome Web Store',
+    about: [
+      'Webmark is a Chrome extension that remembers where you stopped reading. Click a spot on a page and it draws a line there. Refresh, or come back another day, and the line is still waiting.',
+      'Everything it saves stays in your browser. There is no account and nothing is sent anywhere.',
+    ],
+    features: [
+      'One click sets a reading line, with the date and time',
+      'Several webmarks on the same page',
+      'A list of every page you have marked',
+      'Stored locally, with no tracking',
+    ],
+    links: [
+      { label: 'Chrome Web Store', href: 'https://chromewebstore.google.com/detail/webmark/gklcpabmfkjphhoafpdbcnmclmnopimk' },
+      { label: 'Privacy', href: '/privacy/webmarks' },
+    ],
+    icon: { src: webmarkIcon, tile: '#ffffff', inset: true },
+    shots: [{ src: webmarkLine, alt: 'Webmark in Chrome: a blue line across an article marks where reading stopped, with the date beside it' }],
     shotShape: 'wide',
   },
 ];
