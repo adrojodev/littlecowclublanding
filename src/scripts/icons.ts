@@ -1,10 +1,12 @@
-// Desktop icons you can move.
+// Desktop icons you can move and select.
 //
 // On a wide screen an icon is dragged across the wallpaper and settles into
 // the nearest free cell of an invisible grid, the same grid the icons start
-// out on. On a phone the icons are a home screen: press and
-// hold one and they all start to wiggle, then drag to reorder them, as on
-// an iPhone. Both arrangements are remembered in this browser.
+// out on. Several icons can be selected (a drag across the wallpaper, or a
+// click with Shift, Ctrl or Cmd held) and then move together. On a phone
+// the icons are a home screen: press and hold one and they all start to
+// wiggle, then drag to reorder them, as on an iPhone. Both arrangements are
+// remembered in this browser.
 //
 // An icon never leaves its list in the page. A moved icon is only a
 // `translate` away from the place the layout already gave it, so the
@@ -52,17 +54,32 @@ interface Press {
 
 interface Held {
   li: HTMLElement;
-  grabX: number;
-  grabY: number;
   /** Placed on the grid (wide screens) rather than reordered (phones). */
   free: boolean;
+  /** Every icon being carried, with where the pointer holds it. */
+  group: { li: HTMLElement; grabX: number; grabY: number }[];
 }
 
-interface Box {
+export interface Box {
   x: number;
   y: number;
   w: number;
   h: number;
+}
+
+export interface Icons {
+  /** Put every icon back where it started. */
+  tidy(): void;
+  /** Send moved icons back to their own cells. */
+  putBack(ids: string[]): void;
+  isMoved(id: string): boolean;
+  selected(): string[];
+  select(ids: string[]): void;
+  selectAll(): void;
+  /** Select `keep` plus every icon touching a rectangle on the screen. */
+  selectWithin(box: Box, keep: string[]): void;
+  /** Start the phone's wiggle mode. */
+  arrange(): void;
 }
 
 const KEY = 'lcc:icons:v1';
@@ -86,12 +103,13 @@ function load(): Saved {
 }
 
 const key = (cell: Spot) => `${cell.side}:${cell.col}:${cell.row}`;
+const idOf = (li: HTMLElement) => li.dataset.icon ?? '';
 
-export function initIcons(phone: MediaQueryList): { tidy: () => void } {
+export function initIcons(phone: MediaQueryList): Icons {
   const root = document.documentElement;
   const lists = [...document.querySelectorAll<HTMLElement>('[data-icons]')];
   const icons = lists.flatMap((ul) => [...ul.querySelectorAll<HTMLElement>(':scope > [data-icon]')]);
-  const byId = new Map(icons.map((li) => [li.dataset.icon ?? '', li]));
+  const byId = new Map(icons.map((li) => [idOf(li), li]));
   const original = lists.map((ul) => [...ul.children]);
   const doneButton = document.querySelector<HTMLButtonElement>('[data-icons-done]');
   const layer = document.querySelector<HTMLElement>('[data-windows]');
@@ -102,6 +120,7 @@ export function initIcons(phone: MediaQueryList): { tidy: () => void } {
   let held: Held | null = null;
   let swallowUntil = 0;
   let settleTimer = 0;
+  const selection = new Set<HTMLElement>();
 
   function save(): void {
     try {
@@ -113,7 +132,7 @@ export function initIcons(phone: MediaQueryList): { tidy: () => void } {
 
   // ---------- geometry -----------------------------------------------------
 
-  /** An icon's own grid cell, wherever it is currently drawn. */
+  /** An icon's own place in the layout, wherever it is currently drawn. */
   function slot(li: HTMLElement): Box {
     const list = (li.parentElement as HTMLElement).getBoundingClientRect();
     return { x: list.left + li.offsetLeft, y: list.top + li.offsetTop, w: li.offsetWidth, h: li.offsetHeight };
@@ -210,8 +229,9 @@ export function initIcons(phone: MediaQueryList): { tidy: () => void } {
 
   /** Put moved icons in their grid cells; on phones nothing is moved. */
   function arrange(): void {
-    const resting = icons.filter((li) => li !== held?.li);
-    const spotOf = (li: HTMLElement) => (phone.matches ? undefined : saved.spots?.[li.dataset.icon ?? '']);
+    const carried = new Set(held?.group.map((member) => member.li));
+    const resting = icons.filter((li) => !carried.has(li));
+    const spotOf = (li: HTMLElement) => (phone.matches ? undefined : saved.spots?.[idOf(li)]);
     const moved = resting.filter(spotOf);
     const taken = new Set<string>();
 
@@ -259,11 +279,24 @@ export function initIcons(phone: MediaQueryList): { tidy: () => void } {
     });
   }
 
+  // ---------- selection ----------------------------------------------------
+
+  function select(next: Iterable<HTMLElement>): void {
+    const wanted = new Set(next);
+    icons.forEach((li) => {
+      const on = wanted.has(li);
+      li.classList.toggle('is-selected', on);
+      if (on) selection.add(li);
+      else selection.delete(li);
+    });
+  }
+
   // ---------- wiggle mode --------------------------------------------------
 
   function setArranging(on: boolean): void {
     if (arranging === on) return;
     arranging = on;
+    if (on) select([]);
     root.classList.toggle('is-arranging', on);
     if (doneButton) doneButton.hidden = !on;
   }
@@ -301,9 +334,20 @@ export function initIcons(phone: MediaQueryList): { tidy: () => void } {
   function lift(x: number, y: number): void {
     if (!press) return;
     const { li, pointerId } = press;
-    const r = li.getBoundingClientRect();
-    held = { li, grabX: x - r.left, grabY: y - r.top, free: !phone.matches };
-    li.classList.add('is-held');
+    const free = !phone.matches;
+    // Dragging one of several selected icons carries them all; dragging
+    // any other icon carries just that one.
+    if (!free || !selection.has(li)) select([]);
+    const carried = free && selection.size > 1 ? [...selection] : [li];
+    held = {
+      li,
+      free,
+      group: carried.map((member) => {
+        const r = member.getBoundingClientRect();
+        member.classList.add('is-held');
+        return { li: member, grabX: x - r.left, grabY: y - r.top };
+      }),
+    };
     document.body.classList.add('is-dragging');
     // Capture on something that never moves: the icon itself may be
     // re-inserted while it is dragged, which would drop the capture.
@@ -316,53 +360,55 @@ export function initIcons(phone: MediaQueryList): { tidy: () => void } {
 
   function follow(x: number, y: number): void {
     if (!held) return;
-    const { li, grabX, grabY, free } = held;
-    let cell = slot(li);
-    let left = x - grabX;
-    let top = y - grabY;
-    if (free) {
-      left = clampX(left, cell.w);
-      top = clampY(top, cell.h);
-    } else if (reorder(li, left + cell.w / 2, top + cell.h / 2)) {
-      cell = slot(li);
-    }
-    li.style.translate = `${Math.round(left - cell.x)}px ${Math.round(top - cell.y)}px`;
+    held.group.forEach(({ li, grabX, grabY }) => {
+      let cell = slot(li);
+      let left = x - grabX;
+      let top = y - grabY;
+      if (held!.free) {
+        left = clampX(left, cell.w);
+        top = clampY(top, cell.h);
+      } else if (reorder(li, left + cell.w / 2, top + cell.h / 2)) {
+        cell = slot(li);
+      }
+      li.style.translate = `${Math.round(left - cell.x)}px ${Math.round(top - cell.y)}px`;
+    });
   }
 
   function drop(): void {
     if (!held) return;
-    const { li, free } = held;
+    const { free, group } = held;
+    const carried = new Set(group.map((member) => member.li));
     held = null;
-    li.classList.remove('is-held');
+    carried.forEach((li) => li.classList.remove('is-held'));
     document.body.classList.remove('is-dragging');
-    swallowUntil = performance.now() + 400;
+    swallowUntil = performance.now() + 300;
 
     if (free) {
-      // Settle into the nearest cell no other icon is using.
+      // Each one settles into the nearest cell no other icon is using.
       const g = grid();
-      const dropped = li.getBoundingClientRect();
       const taken = new Set(
         icons
-          .filter((other) => other !== li)
+          .filter((other) => !carried.has(other))
           .map((other) => {
             const r = other.getBoundingClientRect();
             return key(nearestFree(r.left, r.top, g, new Set()));
           }),
       );
-      const cell = nearestFree(dropped.left, dropped.top, g, taken);
-      const id = li.dataset.icon ?? '';
       const spots = { ...saved.spots };
-      // Back where the layout would put it anyway: nothing to remember.
-      if (key(cell) === key(homeCell(li, g))) delete spots[id];
-      else spots[id] = cell;
+      carried.forEach((li) => {
+        const dropped = li.getBoundingClientRect();
+        const cell = nearestFree(dropped.left, dropped.top, g, taken);
+        taken.add(key(cell));
+        // Back where the layout would put it anyway: nothing to remember.
+        if (key(cell) === key(homeCell(li, g))) delete spots[idOf(li)];
+        else spots[idOf(li)] = cell;
+      });
       saved.spots = spots;
       settle();
       arrange();
     } else {
-      li.style.translate = ''; // glides into its cell
-      saved.order = Object.fromEntries(
-        lists.map((ul) => [ul.dataset.icons ?? '', ([...ul.children] as HTMLElement[]).map((el) => el.dataset.icon ?? '')]),
-      );
+      carried.forEach((li) => (li.style.translate = '')); // glides into its cell
+      saved.order = Object.fromEntries(lists.map((ul) => [ul.dataset.icons ?? '', ([...ul.children] as HTMLElement[]).map(idOf)]));
     }
     save();
   }
@@ -417,22 +463,30 @@ export function initIcons(phone: MediaQueryList): { tidy: () => void } {
       window.addEventListener('pointercancel', onUp);
     });
 
-    // The browser's own link dragging and long-press menu would fight ours.
+    // The browser's own link dragging would fight ours.
     ul.addEventListener('dragstart', (e) => e.preventDefault());
-    ul.addEventListener('contextmenu', (e) => {
-      if (phone.matches || arranging) e.preventDefault();
-    });
   });
 
-  // A drag must not also open the icon, and wiggling icons open nothing.
+  // A drag must not also open the icon, wiggling icons open nothing, and a
+  // click with a modifier key selects instead of opening.
   window.addEventListener(
     'click',
     (e) => {
-      const onIcon = e.target instanceof Element && e.target.closest('[data-icon]');
-      if ((arranging && onIcon) || performance.now() < swallowUntil) {
+      const li = e.target instanceof Element ? e.target.closest<HTMLElement>('[data-icon]') : null;
+      const swallow = () => {
         e.preventDefault();
         e.stopPropagation();
+      };
+      if ((arranging && li) || performance.now() < swallowUntil) return swallow();
+      if (!li) return;
+      if (!phone.matches && (e.shiftKey || e.metaKey || e.ctrlKey)) {
+        const next = new Set(selection);
+        if (next.has(li)) next.delete(li);
+        else next.add(li);
+        select(next);
+        return swallow();
       }
+      select([]); // an ordinary click opens the icon and lets go of the rest
     },
     true,
   );
@@ -451,11 +505,15 @@ export function initIcons(phone: MediaQueryList): { tidy: () => void } {
   );
 
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') setArranging(false);
+    if (e.key === 'Escape') {
+      setArranging(false);
+      select([]);
+    }
   });
 
   phone.addEventListener('change', () => {
     setArranging(false);
+    select([]);
     arrange();
   });
   window.addEventListener('resize', arrange);
@@ -467,7 +525,6 @@ export function initIcons(phone: MediaQueryList): { tidy: () => void } {
   arrange();
 
   return {
-    /** Put every icon back where it started. */
     tidy(): void {
       saved = {};
       try {
@@ -478,5 +535,29 @@ export function initIcons(phone: MediaQueryList): { tidy: () => void } {
       settle();
       flip(restoreOriginalOrder);
     },
+
+    putBack(ids: string[]): void {
+      const spots = { ...saved.spots };
+      ids.forEach((id) => delete spots[id]);
+      saved.spots = spots;
+      settle();
+      arrange();
+      save();
+    },
+
+    isMoved: (id) => Boolean(saved.spots?.[id]),
+    selected: () => [...selection].map(idOf),
+    select: (ids) => select(ids.map((id) => byId.get(id)).filter((li): li is HTMLElement => Boolean(li))),
+    selectAll: () => select(icons),
+
+    selectWithin(box, keep): void {
+      const touching = icons.filter((li) => {
+        const r = li.getBoundingClientRect();
+        return r.left < box.x + box.w && r.right > box.x && r.top < box.y + box.h && r.bottom > box.y;
+      });
+      select([...touching, ...keep.map((id) => byId.get(id)).filter((li): li is HTMLElement => Boolean(li))]);
+    },
+
+    arrange: () => setArranging(true),
   };
 }

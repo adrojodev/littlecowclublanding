@@ -6,37 +6,18 @@ import Window from '../components/desktop/Window.astro';
 import AppIcon from '../components/desktop/AppIcon.astro';
 import PixelArt from '../components/desktop/PixelArt.astro';
 import Snowcut from '../components/desktop/Snowcut.astro';
+import Wallpaper from '../components/desktop/Wallpaper.astro';
 import { projects, snowcut, contact } from '../data/projects';
+import { wallpapers } from '../data/wallpapers';
 
 const herdCount = projects.length + 1;
 const description =
-	'Little Cow Club is a very small software company. We make Mini Briefs, Dine, Happy Places, Keep it short and a paper snowflake maker you can use right here.';
+	'Little Cow Club is a very small software company. We make Mini Briefs, Dine, Happy Places, Keep it short, Webmark and a paper snowflake maker you can use right here.';
 ---
 
 <Layout title="Little Cow Club — Moooooooooooooooooooo" description={description}>
-	<!-- ============ wallpaper ============ -->
-	<div class="wallpaper" aria-hidden="true">
-		<div class="cloud cloud-1"><PixelArt name="cloud" /></div>
-		<div class="cloud cloud-2"><PixelArt name="cloudSmall" /></div>
-		<div class="cloud cloud-3"><PixelArt name="cloud" /></div>
-		<div class="pasture">
-			<span class="sprite" style="left:6%;top:26%;height:20px"><PixelArt name="flower" /></span>
-			<span class="sprite" style="left:19%;top:58%;height:12px"><PixelArt name="tuft" /></span>
-			<span class="sprite" style="left:31%;top:22%;height:12px"><PixelArt name="tuft" /></span>
-			<span class="sprite" style="left:44%;top:52%;height:20px"><PixelArt name="flowerRed" /></span>
-			<span class="sprite" style="left:58%;top:30%;height:12px"><PixelArt name="tuft" /></span>
-			<span class="sprite" style="left:69%;top:62%;height:20px"><PixelArt name="flower" /></span>
-			<span class="sprite" style="left:81%;top:24%;height:20px"><PixelArt name="flowerRed" /></span>
-			<span class="sprite" style="left:92%;top:54%;height:12px"><PixelArt name="tuft" /></span>
-		</div>
-	</div>
-
-	<div class="cow-walker" data-cow-walker>
-		<button type="button" class="cow" data-moo aria-label="Pet the cow">
-			<span class="cow-bubble" data-cow-bubble hidden>Moo!</span>
-			<span class="cow-flip"><img src="/assets/cow.png" alt="" width="96" height="60" /></span>
-		</button>
-	</div>
+	<!-- ============ wallpaper and cow ============ -->
+	<Wallpaper />
 
 	<!-- ============ menu bar ============ -->
 	<header class="menubar">
@@ -50,6 +31,7 @@ const description =
 					<a class="menu-row" href="#home" data-open="home">Home</a>
 					<a class="menu-row" href="#about" data-open="about">About the club</a>
 					<a class="menu-row" href="#contact" data-open="contact">Contact</a>
+					<a class="menu-row" href="#settings" data-open="settings">Settings</a>
 					<hr class="menu-sep" />
 					<a class="menu-row" href="/privacy/webmarks">Webmarks privacy</a>
 					<hr class="menu-sep" />
@@ -135,6 +117,12 @@ const description =
 				<a class="dicon" href="#contact" data-open="contact" draggable="false">
 					<span class="dicon-art"><AppIcon sprite="letter" /></span>
 					<span class="dicon-label">Contact</span>
+				</a>
+			</li>
+			<li data-icon="settings">
+				<a class="dicon" href="#settings" data-open="settings" draggable="false">
+					<span class="dicon-art"><AppIcon sprite="gear" /></span>
+					<span class="dicon-label">Settings</span>
 				</a>
 			</li>
 			<li data-icon="trash">
@@ -323,6 +311,36 @@ const description =
 					</div>
 					<p class="mail-hint">Nothing is sent from this page. The button opens a draft in your own mail app.</p>
 				</form>
+			</div>
+		</Window>
+
+		<Window id="settings" title="Settings" width={640} height={600}>
+			<AppIcon slot="icon" sprite="gear" />
+			<div class="doc settings">
+				<span class="eyebrow">Settings</span>
+				<h2>Wallpaper</h2>
+				<p class="settings-hint">Every wallpaper does something. Click around it, and pet the cow.</p>
+				<div class="wallgrid" role="group" aria-label="Wallpaper">
+					{
+						wallpapers.map((w) => (
+							<button type="button" class="wallpick" data-wallpaper-pick={w.id} aria-pressed={w.id === 'pasture' ? 'true' : 'false'}>
+								<span class="wallthumb" style={`background:${w.preview}`} />
+								<span class="wallname">{w.name}</span>
+								<span class="wallblurb">{w.blurb}</span>
+							</button>
+						))
+					}
+				</div>
+				<h2>Motion</h2>
+				<label class="switch">
+					<input type="checkbox" data-setting-motion checked />
+					<span>Animate the wallpaper</span>
+				</label>
+				<h2>Icons</h2>
+				<p class="settings-hint">Drag icons to move them. On a phone, press and hold one first.</p>
+				<div class="actions">
+					<button type="button" class="btn btn-quiet" data-icons-tidy>Tidy icons</button>
+				</div>
 			</div>
 		</Window>
 

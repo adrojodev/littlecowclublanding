@@ -1,0 +1,388 @@
+/* ==========================================================================
+   Little Cow Club — wallpapers
+   Five small scenes and one cow. <html data-wallpaper> picks the scene; the
+   markup is in src/components/desktop/Wallpaper.astro and the clicking is
+   in src/scripts/wallpapers.ts. Everything is banded colour and stepped
+   motion, like the rest of the desktop.
+   ========================================================================== */
+
+.wallpaper {
+  position: fixed; inset: 0; z-index: 0; overflow: hidden;
+  background: var(--sky); touch-action: none;
+  user-select: none; -webkit-user-select: none;
+}
+
+/* One scene. --s1..3 are the sky bands, --g1..3 the ground bands. */
+.wp {
+  --horizon: calc(100% - var(--pasture));
+  position: absolute; inset: 0; display: none; overflow: hidden;
+  background: linear-gradient(
+    to bottom,
+    var(--s1) 0,
+    var(--s1) calc(var(--horizon) - 72px),
+    var(--s2) calc(var(--horizon) - 72px),
+    var(--s2) calc(var(--horizon) - 32px),
+    var(--s3) calc(var(--horizon) - 32px)
+  );
+}
+html[data-wallpaper='pasture'] .wp-pasture,
+html[data-wallpaper='night'] .wp-night,
+html[data-wallpaper='sunset'] .wp-sunset,
+html[data-wallpaper='river'] .wp-river,
+html[data-wallpaper='space'] .wp-space { display: block; }
+
+.ground {
+  position: absolute; left: 0; right: 0; bottom: 0; height: var(--pasture);
+  background: linear-gradient(to bottom, var(--g1) 0, var(--g1) 42%, var(--g2) 42%, var(--g2) 74%, var(--g3) 74%);
+}
+/* a row of pixel blades along the top edge, in the ground's own colour */
+.ground::before, .bank::before {
+  --blades: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 3' shape-rendering='crispEdges'%3E%3Cpath d='M0 0h1v1H0zM3 0h1v1H3zM0 1h2v1H0zM3 1h1v1H3zM5 1h2v1H5zM0 2h8v1H0z'/%3E%3C/svg%3E");
+  content: '';
+  position: absolute; left: 0; right: 0; bottom: 100%; height: calc(3 * var(--px));
+  background: var(--g1);
+  -webkit-mask: var(--blades) repeat-x left bottom / calc(8 * var(--px)) calc(3 * var(--px));
+  mask: var(--blades) repeat-x left bottom / calc(8 * var(--px)) calc(3 * var(--px));
+}
+
+.sprite { position: absolute; }
+.sprite svg { display: block; width: auto; height: 100%; }
+
+.cloud { position: absolute; left: 0; will-change: transform; }
+.cloud svg { display: block; width: auto; }
+.cloud-1 { top: 12%; animation: drift 180s linear -40s infinite; }
+.cloud-1 svg { height: calc(7 * 6px); }
+.cloud-2 { top: 30%; animation: drift 260s linear -170s infinite; opacity: 0.9; }
+.cloud-2 svg { height: calc(4 * 6px); }
+.cloud-3 { top: 46%; animation: drift 220s linear -95s infinite; opacity: 0.85; }
+.cloud-3 svg { height: calc(7 * 4px); }
+
+@keyframes drift {
+  from { transform: translateX(-220px); }
+  to { transform: translateX(100vw); }
+}
+
+/* things a click leaves behind or sets off */
+.fx { position: absolute; pointer-events: none; }
+.fx svg { display: block; width: auto; height: 100%; }
+[data-poke] { cursor: pointer; }
+[data-poke].is-poked { animation: poke 0.4s steps(4); }
+@keyframes poke {
+  0%, 100% { transform: none; }
+  25% { transform: translateY(-8px) rotate(-6deg); }
+  75% { transform: translateY(-4px) rotate(6deg); }
+}
+
+.stars { position: absolute; inset: 0; }
+.star {
+  position: absolute; width: 4px; height: 4px; background: var(--cream);
+  animation: twinkle 3.6s steps(1) infinite;
+}
+.star.is-big {
+  box-shadow: 4px 0 0 rgba(240, 236, 228, 0.55), -4px 0 0 rgba(240, 236, 228, 0.55),
+    0 4px 0 rgba(240, 236, 228, 0.55), 0 -4px 0 rgba(240, 236, 228, 0.55);
+}
+.star.is-born { animation: born 0.5s steps(5), twinkle 3.6s steps(1) 0.5s infinite; }
+.is-twinkling .star { animation-duration: 0.3s; }
+@keyframes twinkle {
+  0%, 62% { opacity: 1; }
+  63%, 100% { opacity: 0.3; }
+}
+@keyframes born {
+  from { transform: scale(4); opacity: 0.2; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+/* ---------- pasture ------------------------------------------------------ */
+
+.wp-pasture {
+  --s1: var(--sky); --s2: var(--sky-2); --s3: var(--sky-3);
+  --g1: var(--grass); --g2: var(--grass-2); --g3: var(--grass-3);
+}
+
+.fx-flower { height: 20px; transform-origin: 50% 100%; animation: sprout 0.3s steps(3); }
+@keyframes sprout {
+  from { transform: scaleY(0); }
+  to { transform: scaleY(1); }
+}
+
+.fx-puff { height: 16px; animation: puff 5s steps(25) forwards; }
+@keyframes puff {
+  0% { transform: translateX(0) scale(0.4); opacity: 0; }
+  8% { transform: translateX(6px) scale(1); opacity: 1; }
+  75% { opacity: 1; }
+  100% { transform: translateX(90px) scale(1); opacity: 0; }
+}
+
+/* ---------- night -------------------------------------------------------- */
+
+.wp-night {
+  --s1: #0a1030; --s2: #121a45; --s3: #1b2760;
+  --g1: #1f7a4c; --g2: #1a6a42; --g3: #155a38;
+}
+.wp-night .stars { bottom: calc(var(--pasture) + 24px); }
+.wp-night .ground .sprite { filter: brightness(0.55); }
+
+.moon { position: absolute; right: 19%; top: 15%; width: 72px; }
+.moon svg { display: block; width: 100%; height: auto; }
+.moon .moon-full, .wp-night.is-full .moon .moon-crescent { display: none; }
+.wp-night.is-full .moon .moon-full { display: block; }
+
+.fx-shoot {
+  width: 4px; height: 4px; background: #fff;
+  box-shadow: 4px -4px 0 rgba(255, 255, 255, 0.8), 8px -8px 0 rgba(255, 255, 255, 0.6),
+    12px -12px 0 rgba(255, 255, 255, 0.4), 16px -16px 0 rgba(255, 255, 255, 0.2);
+  animation: shoot 0.7s steps(14) forwards;
+}
+@keyframes shoot {
+  0% { transform: translate(0, 0); opacity: 1; }
+  80% { opacity: 1; }
+  100% { transform: translate(-260px, 260px); opacity: 0; }
+}
+
+.fx-firefly {
+  width: 4px; height: 4px; background: #ffe680; box-shadow: 0 0 0 4px rgba(255, 230, 128, 0.22);
+  animation: glow 2.2s steps(1) infinite, wander 9s steps(18) infinite alternate;
+}
+@keyframes glow {
+  0%, 55% { opacity: 1; }
+  56%, 100% { opacity: 0.15; }
+}
+@keyframes wander {
+  from { transform: translate(0, 0); }
+  to { transform: translate(var(--dx, 28px), var(--dy, -18px)); }
+}
+
+/* ---------- sunset ------------------------------------------------------- */
+
+.wp-sunset {
+  --g1: #3a2a4a; --g2: #33243f; --g3: #2b1e36;
+  background: linear-gradient(
+    to bottom,
+    #4a2f7a 0, #4a2f7a 16%,
+    #8a4391 16%, #8a4391 32%,
+    #cf5680 32%, #cf5680 48%,
+    #f27d5e 48%, #f27d5e 62%,
+    #f9aa5e 62%, #f9aa5e calc(var(--horizon) - 32px),
+    #fdd681 calc(var(--horizon) - 32px)
+  );
+}
+.wp-sunset .ground .sprite { filter: brightness(0); opacity: 0.45; }
+.wp-sunset .cloud { filter: sepia(1) saturate(2.4) hue-rotate(-18deg); opacity: 0.75; }
+
+/* the sky dims a little each time the sun is nudged down */
+.dusk { position: absolute; inset: 0; background: #1a1240; opacity: 0; transition: opacity 0.6s steps(6); }
+.sun {
+  position: absolute; left: 58%; bottom: calc(var(--pasture) - 64px); width: 144px;
+  transition: translate 0.6s steps(6);
+}
+.sun svg { display: block; width: 100%; height: auto; }
+.wp-sunset[data-step='1'] .sun { translate: 0 26px; }
+.wp-sunset[data-step='2'] .sun { translate: 0 52px; }
+.wp-sunset[data-step='3'] .sun { translate: 0 90px; }
+.wp-sunset[data-step='1'] .dusk { opacity: 0.18; }
+.wp-sunset[data-step='2'] .dusk { opacity: 0.36; }
+.wp-sunset[data-step='3'] .dusk { opacity: 0.58; }
+
+.fx-flock { width: 0; height: 0; animation: flock 6s linear forwards; }
+.fx-bird { position: absolute; height: 12px; animation: flap 0.36s steps(2) infinite alternate; }
+.fx-bird svg { display: block; width: auto; height: 100%; }
+@keyframes flock {
+  to { transform: translate(72vw, -42vh); }
+}
+@keyframes flap {
+  from { transform: scaleY(1); }
+  to { transform: scaleY(0.35); }
+}
+
+/* ---------- river -------------------------------------------------------- */
+
+.wp-river {
+  --horizon: calc(100% - var(--pasture) - 80px);
+  --shore: calc(var(--pasture) * 0.42);
+  --s1: #49c3ee; --s2: #7ad4f3; --s3: #a8e4f8;
+  --g1: var(--grass); --g2: var(--grass-2); --g3: var(--grass-3);
+}
+.wp-river .ground { height: var(--shore); }
+.bank {
+  --g1: #2fae62;
+  position: absolute; left: 0; right: 0; bottom: calc(var(--pasture) + 64px); height: 16px; background: var(--g1);
+}
+.water {
+  position: absolute; left: 0; right: 0; bottom: var(--shore); height: calc(var(--pasture) - var(--shore) + 64px);
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 12' shape-rendering='crispEdges'%3E%3Cpath fill='%2376c8f2' d='M1 1h5v1H1zM14 4h6v1h-6zM4 8h4v1H4zM17 10h5v1h-5z'/%3E%3C/svg%3E")
+      0 0 / 96px 48px,
+    linear-gradient(to bottom, #2a9ee0 0, #2a9ee0 34%, #1e8fd6 34%, #1e8fd6 72%, #1880c4 72%);
+  animation: flow 4s steps(24) infinite;
+}
+@keyframes flow {
+  to { background-position: 96px 0, 0 0; }
+}
+
+.fx-ripple {
+  width: 8px; height: 4px; margin: -2px 0 0 -4px; border: 4px solid #d6f1fd; box-sizing: content-box;
+  animation: ripple 0.8s steps(5) forwards;
+}
+@keyframes ripple {
+  to { width: 72px; height: 24px; margin: -12px 0 0 -36px; opacity: 0; }
+}
+.fx-fish { height: 20px; margin: -10px 0 0 -16px; animation: leap 0.9s steps(5) forwards; }
+@keyframes leap {
+  0% { transform: translate(-18px, 0) rotate(-40deg); opacity: 0; }
+  15% { opacity: 1; }
+  50% { transform: translate(0, -46px) rotate(0deg); opacity: 1; }
+  85% { opacity: 1; }
+  100% { transform: translate(18px, 0) rotate(40deg); opacity: 0; }
+}
+
+/* ---------- space -------------------------------------------------------- */
+
+.wp-space { --s1: #0b0820; --s2: #120d2e; --s3: #1a1240; }
+
+.planet { position: absolute; left: 13%; top: 24%; width: 156px; }
+.planet svg { display: block; width: 100%; height: auto; }
+
+.ufo { position: absolute; left: 0; top: 58%; width: 78px; animation: ufo-pass 48s linear -12s infinite; }
+.ufo svg { display: block; width: 100%; height: auto; animation: ufo-bob 1.1s steps(2) infinite alternate; }
+.ufo.is-poked { animation: ufo-pass 48s linear -12s infinite; } /* keep flying while it beams */
+.ufo-beam {
+  position: absolute; left: 12px; top: 100%; width: 54px; height: 0;
+  background: rgba(159, 245, 201, 0.4); clip-path: polygon(28% 0, 72% 0, 100% 100%, 0 100%);
+  transition: height 0.3s steps(5);
+}
+.ufo.is-beaming .ufo-beam { height: 110px; }
+@keyframes ufo-pass {
+  from { transform: translateX(-120px); }
+  to { transform: translateX(calc(100vw + 40px)); }
+}
+@keyframes ufo-bob {
+  from { transform: translateY(0); }
+  to { transform: translateY(6px); }
+}
+
+/* ---------- the cow ------------------------------------------------------ */
+
+.cow-walker { position: fixed; z-index: 1; left: 0; bottom: calc(var(--pasture) - 22px); }
+.cow-walker.is-mooing, .cow-walker.is-mooing .cow-flip { animation-play-state: paused; }
+
+.cow {
+  position: relative; display: block; padding: 0; border: 0; background: none;
+  cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: none;
+}
+.cow-flip, .cow-art { display: block; }
+.cow-pose, .cow-raft { display: none; width: auto; }
+.cow-stand { height: calc(17 * var(--px)); }
+.cow-lie, .cow-sleep { height: calc(12 * var(--px)); }
+.cow-space { height: calc(20 * var(--px)); }
+.cow-raft { height: calc(3 * var(--px)); margin: -4px 0 0 -8px; }
+
+.cow-bubble {
+  position: absolute; z-index: 1; left: 50%; bottom: calc(100% + 10px); transform: translateX(-50%);
+  padding: 4px 10px 5px; white-space: nowrap;
+  font: 600 18px/1 var(--font-pixel);
+  color: var(--ink); background: var(--paper);
+  border: 3px solid var(--ink); box-shadow: 3px 3px 0 rgba(47, 40, 35, 0.3);
+}
+.cow-bubble::after {
+  content: ''; position: absolute; left: 50%; top: 100%; margin-left: -4px;
+  width: 8px; height: 8px; background: var(--ink);
+  clip-path: polygon(0 0, 100% 0, 100% 50%, 50% 50%, 50% 100%, 0 100%);
+}
+.cow-bubble[hidden] { display: none; }
+
+.cow-zzz { display: none; position: absolute; left: 2px; bottom: calc(100% - 6px); font: 700 16px/1 var(--font-pixel); color: var(--cream); }
+.cow-zzz i { position: absolute; left: 0; bottom: 0; font-style: normal; opacity: 0; animation: zzz 3s steps(6) infinite; }
+.cow-zzz i:nth-child(2) { animation-delay: 1s; }
+.cow-zzz i:nth-child(3) { animation-delay: 2s; font-size: 20px; }
+@keyframes zzz {
+  0% { transform: translate(0, 0); opacity: 0; }
+  15% { opacity: 1; }
+  70% { opacity: 1; }
+  100% { transform: translate(-22px, -38px); opacity: 0; }
+}
+
+/* pasture: back and forth across the field */
+html[data-wallpaper='pasture'] .cow-stand { display: block; }
+html[data-wallpaper='pasture'] .cow-walker { animation: cow-walk 90s linear infinite; }
+html[data-wallpaper='pasture'] .cow-flip { animation: cow-flip 90s steps(1) infinite; }
+html[data-wallpaper='pasture'] .cow-art { animation: cow-hop 0.9s steps(2) infinite; }
+
+/* night: asleep in the grass, until someone pets it */
+html[data-wallpaper='night'] .cow-walker { left: 54vw; bottom: calc(var(--pasture) - 30px); }
+html[data-wallpaper='night'] .cow-sleep { display: block; }
+html[data-wallpaper='night'] .cow-art { transform-origin: 50% 100%; animation: cow-breathe 2.6s steps(2) infinite alternate; }
+html[data-wallpaper='night'] .cow-zzz { display: block; }
+html[data-wallpaper='night'] .cow-walker.is-awake .cow-sleep,
+html[data-wallpaper='night'] .cow-walker.is-awake .cow-zzz { display: none; }
+html[data-wallpaper='night'] .cow-walker.is-awake .cow-lie { display: block; }
+html[data-wallpaper='night'] .cow-walker.is-awake .cow-art { animation: none; }
+
+/* sunset: lying down, turned towards the sun, lit from behind */
+html[data-wallpaper='sunset'] .cow-walker { left: 32vw; bottom: calc(var(--pasture) - 30px); }
+html[data-wallpaper='sunset'] .cow-lie { display: block; }
+html[data-wallpaper='sunset'] .cow-flip { transform: scaleX(-1); }
+html[data-wallpaper='sunset'] .cow-art { filter: brightness(0.7) saturate(0.85); }
+
+/* river: standing on a raft that drifts downstream */
+html[data-wallpaper='river'] .cow-walker { bottom: calc(var(--pasture) * 0.42 + 30px); animation: raft-drift 80s linear -20s infinite; }
+html[data-wallpaper='river'] .cow-stand, html[data-wallpaper='river'] .cow-raft { display: block; }
+html[data-wallpaper='river'] .cow-flip { transform: scaleX(-1); }
+html[data-wallpaper='river'] .cow-art { animation: raft-bob 1.4s steps(2) infinite alternate; }
+
+/* space: placed and thrown by the script, tumbling slowly */
+html[data-wallpaper='space'] .cow-walker { top: 0; bottom: auto; }
+html[data-wallpaper='space'] .cow { cursor: grab; }
+html[data-wallpaper='space'] .cow-walker.is-thrown .cow { cursor: grabbing; }
+html[data-wallpaper='space'] .cow-space { display: block; }
+html[data-wallpaper='space'] .cow-art { animation: cow-tumble 32s steps(48) infinite; }
+html[data-wallpaper='space'] .cow-walker.is-spinning .cow-art { animation-duration: 2.4s; }
+
+@keyframes cow-walk {
+  0% { transform: translateX(14vw); }
+  49% { transform: translateX(calc(86vw - 108px)); }
+  50% { transform: translateX(calc(86vw - 108px)); }
+  99% { transform: translateX(14vw); }
+  100% { transform: translateX(14vw); }
+}
+/* the sprite faces left, so it is mirrored on the way out */
+@keyframes cow-flip {
+  0% { transform: scaleX(-1); }
+  50% { transform: scaleX(1); }
+  100% { transform: scaleX(-1); }
+}
+@keyframes cow-hop {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-4px); }
+}
+@keyframes cow-breathe {
+  from { transform: scaleY(1); }
+  to { transform: scaleY(0.94); }
+}
+@keyframes raft-drift {
+  from { transform: translateX(-140px); }
+  to { transform: translateX(100vw); }
+}
+@keyframes raft-bob {
+  from { transform: translateY(0); }
+  to { transform: translateY(3px); }
+}
+@keyframes cow-tumble {
+  to { transform: rotate(360deg); }
+}
+
+/* ---------- no motion ---------------------------------------------------- */
+
+/* Settings > "Animate the wallpaper" switched off: everything holds still. */
+html[data-motion='off'] :is(.wallpaper *, .cow-walker, .cow-walker *) { animation-play-state: paused !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  :is(.wallpaper *, .cow-walker, .cow-walker *) { animation: none !important; transition: none !important; }
+  html[data-wallpaper='pasture'] .cow-walker { transform: translateX(62vw); }
+  html[data-wallpaper='river'] .cow-walker { transform: translateX(40vw); }
+  .cloud-1 { transform: translateX(12vw); }
+  .cloud-2 { transform: translateX(58vw); }
+  .cloud-3 { transform: translateX(34vw); }
+  .ufo { transform: translateX(70vw); }
+  .cow-zzz i:nth-child(3) { opacity: 1; }
+}

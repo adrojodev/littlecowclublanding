@@ -4,7 +4,11 @@
 // Windows are plain <section data-win> elements already in the page. This
 // file only decides which are open, where they sit, and which is in front.
 
+import { wallpapers as wallpaperList } from '../data/wallpapers';
+import { initBackdrop, isBackdrop } from './backdrop';
+import { initContextMenu, type MenuEntry } from './contextmenu';
 import { initIcons } from './icons';
+import { initWallpapers } from './wallpapers';
 
 interface Win {
   id: string;
@@ -248,33 +252,14 @@ if (clock) {
   window.setInterval(tick, 15_000);
 }
 
-// ---------- the cow --------------------------------------------------------
+// ---------- wallpapers and the cow ----------------------------------------
 
-const walker = document.querySelector<HTMLElement>('[data-cow-walker]');
-const bubble = document.querySelector<HTMLElement>('[data-cow-bubble]');
-const baseTitle = document.title;
-let moos = 0;
-let mooTimer = 0;
-
-function moo(): void {
-  if (!walker || !bubble) return;
-  moos += 1;
-  const os = 'o'.repeat(Math.min(2 + moos, 14));
-  bubble.textContent = `M${os}!`;
-  bubble.hidden = false;
-  walker.classList.add('is-mooing');
-  document.title = `${baseTitle}${'o'.repeat(Math.min(moos, 40))}`;
-  window.clearTimeout(mooTimer);
-  mooTimer = window.setTimeout(() => {
-    bubble.hidden = true;
-    walker.classList.remove('is-mooing');
-  }, 1600);
-}
+const wallpapers = initWallpapers();
 
 document.querySelectorAll('[data-moo]').forEach((el) =>
   el.addEventListener('click', () => {
     setMenu(null);
-    moo();
+    wallpapers.pet();
   }),
 );
 
@@ -282,9 +267,109 @@ document.querySelectorAll('[data-moo]').forEach((el) =>
 
 const icons = initIcons(phone);
 
-document.querySelector('[data-icons-tidy]')?.addEventListener('click', () => {
-  setMenu(null);
-  icons.tidy();
+document.querySelectorAll('[data-icons-tidy]').forEach((el) =>
+  el.addEventListener('click', () => {
+    setMenu(null);
+    icons.tidy();
+  }),
+);
+
+// ---------- the bare desktop: click, drag to select, secondary click -------
+
+const root = document.documentElement;
+const ctx = initContextMenu();
+
+initBackdrop({
+  phone,
+  icons,
+  busy: () => ctx.isOpen() || openMenu() !== null || root.classList.contains('is-arranging'),
+  onClick: (x, y) => wallpapers.poke(x, y),
+  onHold: (x, y) => ctx.show(x, y, desktopMenu()),
+});
+
+function desktopMenu(): MenuEntry[] {
+  return [
+    { heading: 'Wallpaper' },
+    ...wallpaperList.map((w) => ({ label: w.name, checked: w.id === wallpapers.current(), run: () => wallpapers.set(w.id) })),
+    'separator',
+    phone.matches ? { label: 'Rearrange icons', run: icons.arrange } : { label: 'Select all icons', run: icons.selectAll },
+    { label: 'Tidy icons', run: icons.tidy },
+    'separator',
+    { label: 'Settings', run: () => open('settings') },
+    { label: 'Moo', run: wallpapers.pet },
+  ];
+}
+
+function iconMenu(ids: string[], opener: HTMLElement | null): MenuEntry[] {
+  if (phone.matches) {
+    return [
+      { label: 'Open', run: () => open(ids[0], opener) },
+      { label: 'Rearrange icons', run: icons.arrange },
+    ];
+  }
+  return [
+    { label: ids.length > 1 ? `Open ${ids.length} items` : 'Open', run: () => ids.forEach((id) => open(id, opener)) },
+    { label: 'Put back', run: () => icons.putBack(ids), disabled: !ids.some(icons.isMoved) },
+    'separator',
+    { label: 'Select all icons', run: icons.selectAll },
+    { label: 'Tidy icons', run: icons.tidy },
+  ];
+}
+
+function windowMenu(win: Win): MenuEntry[] {
+  const size: MenuEntry[] = phone.matches
+    ? []
+    : [{ label: win.el.classList.contains('is-max') ? 'Restore' : 'Maximize', run: () => win.el.classList.toggle('is-max') }];
+  return [...size, { label: 'Close', run: () => close(win) }];
+}
+
+document.addEventListener('contextmenu', (e) => {
+  if (!(e.target instanceof Element)) return;
+  const target = e.target;
+  // From the keyboard there is no pointer: open beside the thing itself.
+  let { clientX: x, clientY: y } = e;
+  if (x === 0 && y === 0) {
+    const box = target.getBoundingClientRect();
+    x = box.left + Math.min(box.width / 2, 40);
+    y = box.top + Math.min(box.height / 2, 40);
+  }
+
+  const icon = target.closest<HTMLElement>('[data-icon]');
+  if (icon) {
+    e.preventDefault();
+    // On a touch screen a long press on an icon starts the wiggle instead.
+    if ((e as PointerEvent).pointerType === 'touch' || root.classList.contains('is-arranging')) return;
+    setMenu(null);
+    const id = icon.dataset.icon ?? '';
+    if (phone.matches) icons.select([]);
+    else if (!icons.selected().includes(id)) icons.select([id]);
+    const ids = phone.matches ? [id] : icons.selected();
+    ctx.show(x, y, iconMenu(ids, icon.querySelector('a')), icon.querySelector('a'));
+    return;
+  }
+
+  if (isBackdrop(target) || target.closest('[data-cow-walker]')) {
+    e.preventDefault();
+    setMenu(null);
+    ctx.show(x, y, desktopMenu());
+    return;
+  }
+
+  const bar = target.closest('.win-bar');
+  const win = bar && wins.get(bar.closest<HTMLElement>('[data-win]')?.id ?? '');
+  if (win && !target.closest('button')) {
+    e.preventDefault();
+    ctx.show(x, y, windowMenu(win), win.el);
+  }
+});
+
+// Ctrl/Cmd+A on the desktop selects every icon; inside a window it is left alone.
+document.addEventListener('keydown', (e) => {
+  if (e.key.toLowerCase() !== 'a' || !(e.metaKey || e.ctrlKey) || e.altKey || phone.matches) return;
+  const focused = document.activeElement;
+  if (focused instanceof Element && focused.closest('[data-win], input, textarea, select, [contenteditable]')) return;
+  e.preventDefault();
+  icons.selectAll();
 });
 
 // ---------- screenshot pagers ---------------------------------------------

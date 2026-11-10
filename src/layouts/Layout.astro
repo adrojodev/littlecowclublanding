@@ -1,6 +1,7 @@
 ---
 import '@fontsource-variable/pixelify-sans';
 import '../styles/desktop.css';
+import '../styles/wallpapers.css';
 
 interface Props {
 	title: string;
@@ -11,7 +12,7 @@ const { title, description } = Astro.props;
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" data-wallpaper="pasture">
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -23,9 +24,17 @@ const { title, description } = Astro.props;
 		<link rel="icon" type="image/png" href="/favicon.png" />
 		<meta name="generator" content={Astro.generator} />
 		<title>{title}</title>
-		<!-- Windows only behave like windows once scripts run; until then the page is a plain document. -->
+		<!-- Windows only behave like windows once scripts run; until then the page is a plain document.
+		     The saved wallpaper is applied here too, before anything is painted. -->
 		<script is:inline>
-			document.documentElement.classList.add('js');
+			(function (root) {
+				root.classList.add('js');
+				try {
+					var saved = JSON.parse(localStorage.getItem('lcc:settings:v1') || '{}');
+					if (typeof saved.wallpaper === 'string') root.dataset.wallpaper = saved.wallpaper;
+					if (saved.motion === 'off') root.dataset.motion = 'off';
+				} catch (e) {}
+			})(document.documentElement);
 		</script>
 	</head>
 	<body>

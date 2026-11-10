@@ -1,0 +1,125 @@
+---
+// The wallpapers and the cow who lives in them.
+//
+// Every scene is in the page; <html data-wallpaper> decides which one is
+// shown (src/styles/wallpapers.css) and src/scripts/wallpapers.ts makes
+// them answer to clicks. `data-zone` says what a spot is made of (ground,
+// water; anything else is sky) and `data-poke` marks things that react
+// when clicked.
+import PixelArt from './PixelArt.astro';
+
+// The same "random" sky on every build.
+function scatter(count: number, seed: number) {
+  let t = seed;
+  const next = () => {
+    t = (t + 0x6d2b79f5) | 0;
+    let r = Math.imul(t ^ (t >>> 15), 1 | t);
+    r = (r + Math.imul(r ^ (r >>> 7), 61 | r)) ^ r;
+    return ((r ^ (r >>> 14)) >>> 0) / 4294967296;
+  };
+  return Array.from({ length: count }, () => ({
+    left: (next() * 100).toFixed(1),
+    top: (next() * 100).toFixed(1),
+    big: next() > 0.78,
+    delay: (next() * -4).toFixed(2),
+  }));
+}
+
+const nightStars = scatter(46, 7);
+const spaceStars = scatter(70, 21);
+
+const star = (s: (typeof nightStars)[number]) => `left:${s.left}%;top:${s.top}%;animation-delay:${s.delay}s`;
+---
+
+<div class="wallpaper" data-wallpaper-root aria-hidden="true">
+	<!-- Pasture: the cow walks the field. -->
+	<div class="wp wp-pasture" data-wp="pasture">
+		<div class="cloud cloud-1"><PixelArt name="cloud" /></div>
+		<div class="cloud cloud-2"><PixelArt name="cloudSmall" /></div>
+		<div class="cloud cloud-3"><PixelArt name="cloud" /></div>
+		<div class="ground" data-zone="ground">
+			<span class="sprite" style="left:6%;top:26%;height:20px"><PixelArt name="flower" /></span>
+			<span class="sprite" style="left:19%;top:58%;height:12px"><PixelArt name="tuft" /></span>
+			<span class="sprite" style="left:31%;top:22%;height:12px"><PixelArt name="tuft" /></span>
+			<span class="sprite" style="left:44%;top:52%;height:20px"><PixelArt name="flowerRed" /></span>
+			<span class="sprite" style="left:58%;top:30%;height:12px"><PixelArt name="tuft" /></span>
+			<span class="sprite" style="left:69%;top:62%;height:20px"><PixelArt name="flower" /></span>
+			<span class="sprite" style="left:81%;top:24%;height:20px"><PixelArt name="flowerRed" /></span>
+			<span class="sprite" style="left:92%;top:54%;height:12px"><PixelArt name="tuft" /></span>
+		</div>
+	</div>
+
+	<!-- Night: the cow sleeps under the moon. -->
+	<div class="wp wp-night" data-wp="night">
+		<div class="stars">{nightStars.map((s) => <i class:list={['star', { 'is-big': s.big }]} style={star(s)} />)}</div>
+		<div class="moon" data-poke="moon">
+			<PixelArt name="moon" class="moon-crescent" />
+			<PixelArt name="moonFull" class="moon-full" />
+		</div>
+		<div class="ground" data-zone="ground">
+			<span class="sprite" style="left:12%;top:30%;height:12px"><PixelArt name="tuft" /></span>
+			<span class="sprite" style="left:38%;top:58%;height:12px"><PixelArt name="tuft" /></span>
+			<span class="sprite" style="left:66%;top:26%;height:12px"><PixelArt name="tuft" /></span>
+			<span class="sprite" style="left:88%;top:60%;height:12px"><PixelArt name="tuft" /></span>
+		</div>
+	</div>
+
+	<!-- Sunset: the cow lies down to watch. -->
+	<div class="wp wp-sunset" data-wp="sunset" data-step="0">
+		<div class="dusk"></div>
+		<div class="cloud cloud-1"><PixelArt name="cloudSmall" /></div>
+		<div class="cloud cloud-3"><PixelArt name="cloud" /></div>
+		<div class="sun" data-poke="sun"><PixelArt name="sun" /></div>
+		<div class="ground" data-zone="ground">
+			<span class="sprite" style="left:9%;top:32%;height:12px"><PixelArt name="tuft" /></span>
+			<span class="sprite" style="left:47%;top:60%;height:12px"><PixelArt name="tuft" /></span>
+			<span class="sprite" style="left:83%;top:28%;height:12px"><PixelArt name="tuft" /></span>
+		</div>
+	</div>
+
+	<!-- River: the cow rafts downstream. -->
+	<div class="wp wp-river" data-wp="river">
+		<div class="cloud cloud-1"><PixelArt name="cloud" /></div>
+		<div class="cloud cloud-2"><PixelArt name="cloudSmall" /></div>
+		<div class="bank" data-zone="ground"></div>
+		<div class="water" data-zone="water"></div>
+		<div class="ground" data-zone="ground">
+			<span class="sprite" style="left:14%;top:30%;height:20px"><PixelArt name="flower" /></span>
+			<span class="sprite" style="left:52%;top:40%;height:12px"><PixelArt name="tuft" /></span>
+			<span class="sprite" style="left:77%;top:26%;height:20px"><PixelArt name="flowerRed" /></span>
+		</div>
+	</div>
+
+	<!-- Space: the cow floats. -->
+	<div class="wp wp-space" data-wp="space">
+		<div class="stars">{spaceStars.map((s) => <i class:list={['star', { 'is-big': s.big }]} style={star(s)} />)}</div>
+		<div class="planet" data-poke="planet"><PixelArt name="planet" /></div>
+		<div class="ufo" data-poke="ufo">
+			<PixelArt name="ufo" />
+			<i class="ufo-beam"></i>
+		</div>
+	</div>
+
+	<!-- Art the script copies when a click plants or startles something. -->
+	<template data-fx="flower"><span class="sprite fx fx-flower"><PixelArt name="flower" /></span></template>
+	<template data-fx="flowerRed"><span class="sprite fx fx-flower"><PixelArt name="flowerRed" /></span></template>
+	<template data-fx="puff"><span class="fx fx-puff"><PixelArt name="cloudSmall" /></span></template>
+	<template data-fx="bird"><span class="fx-bird"><PixelArt name="bird" /></span></template>
+	<template data-fx="fish"><span class="fx fx-fish"><PixelArt name="fish" /></span></template>
+</div>
+
+<div class="cow-walker" data-cow-walker>
+	<button type="button" class="cow" data-moo aria-label="Pet the cow">
+		<span class="cow-bubble" data-cow-bubble hidden>Moo!</span>
+		<span class="cow-zzz" aria-hidden="true"><i>z</i><i>z</i><i>Z</i></span>
+		<span class="cow-flip">
+			<span class="cow-art">
+				<PixelArt name="cow" class="cow-pose cow-stand" />
+				<PixelArt name="cowLie" class="cow-pose cow-lie" />
+				<PixelArt name="cowSleep" class="cow-pose cow-sleep" />
+				<PixelArt name="cowSpace" class="cow-pose cow-space" />
+				<PixelArt name="raft" class="cow-raft" />
+			</span>
+		</span>
+	</button>
+</div>

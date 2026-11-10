@@ -66,106 +66,6 @@ a { color: inherit; }
 
 .pixel { font-family: var(--font-pixel); }
 
-/* ---------- wallpaper ---------------------------------------------------- */
-
-.wallpaper {
-  position: fixed; inset: 0; z-index: 0; overflow: hidden;
-  /* banded sky: flat blue, then two lighter stripes at the horizon */
-  background: linear-gradient(
-    to bottom,
-    var(--sky) 0,
-    var(--sky) calc(100% - var(--pasture) - 72px),
-    var(--sky-2) calc(100% - var(--pasture) - 72px),
-    var(--sky-2) calc(100% - var(--pasture) - 32px),
-    var(--sky-3) calc(100% - var(--pasture) - 32px)
-  );
-}
-
-.cloud { position: absolute; left: 0; will-change: transform; image-rendering: pixelated; }
-.cloud svg { display: block; width: auto; }
-.cloud-1 { top: 12%; animation: drift 180s linear -40s infinite; }
-.cloud-1 svg { height: calc(7 * 6px); }
-.cloud-2 { top: 30%; animation: drift 260s linear -170s infinite; opacity: 0.9; }
-.cloud-2 svg { height: calc(4 * 6px); }
-.cloud-3 { top: 46%; animation: drift 220s linear -95s infinite; opacity: 0.85; }
-.cloud-3 svg { height: calc(7 * 4px); }
-
-@keyframes drift {
-  from { transform: translateX(-220px); }
-  to { transform: translateX(100vw); }
-}
-
-.pasture {
-  position: absolute; left: 0; right: 0; bottom: 0; height: var(--pasture);
-  background: linear-gradient(
-    to bottom,
-    var(--grass) 0, var(--grass) 42%,
-    var(--grass-2) 42%, var(--grass-2) 74%,
-    var(--grass-3) 74%
-  );
-}
-
-/* a row of pixel blades along the top edge of the field */
-.pasture::before {
-  content: '';
-  position: absolute; left: 0; right: 0; bottom: 100%; height: calc(3 * var(--px));
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 3' shape-rendering='crispEdges'%3E%3Cpath fill='%234ade80' d='M0 0h1v1H0zM3 0h1v1H3zM0 1h2v1H0zM3 1h1v1H3zM5 1h2v1H5zM0 2h8v1H0z'/%3E%3C/svg%3E")
-    repeat-x left bottom / calc(8 * var(--px)) calc(3 * var(--px));
-}
-
-.sprite { position: absolute; }
-.sprite svg { display: block; width: auto; height: 100%; }
-
-/* ---------- the cow ------------------------------------------------------ */
-
-.cow-walker {
-  position: fixed; z-index: 1; left: 0;
-  bottom: calc(var(--pasture) - 22px);
-  animation: cow-walk 90s linear infinite;
-}
-.cow-walker.is-mooing, .cow-walker.is-mooing .cow-flip { animation-play-state: paused; }
-
-.cow {
-  position: relative; display: block; padding: 0; border: 0; background: none;
-  cursor: pointer; -webkit-tap-highlight-color: transparent;
-}
-.cow-flip { display: block; animation: cow-flip 90s steps(1) infinite; }
-.cow img {
-  display: block; width: 96px; height: auto; image-rendering: pixelated;
-  animation: cow-hop 0.9s steps(2) infinite;
-}
-.cow-bubble {
-  position: absolute; left: 50%; bottom: calc(100% + 10px); transform: translateX(-50%);
-  padding: 4px 10px 5px; white-space: nowrap;
-  font: 600 18px/1 var(--font-pixel);
-  color: var(--ink); background: var(--paper);
-  border: 3px solid var(--ink); box-shadow: 3px 3px 0 rgba(47, 40, 35, 0.3);
-}
-.cow-bubble::after {
-  content: ''; position: absolute; left: 50%; top: 100%; margin-left: -4px;
-  width: 8px; height: 8px; background: var(--ink);
-  clip-path: polygon(0 0, 100% 0, 100% 50%, 50% 50%, 50% 100%, 0 100%);
-}
-.cow-bubble[hidden] { display: none; }
-
-@keyframes cow-walk {
-  0% { transform: translateX(14vw); }
-  49% { transform: translateX(calc(86vw - 96px)); }
-  50% { transform: translateX(calc(86vw - 96px)); }
-  99% { transform: translateX(14vw); }
-  100% { transform: translateX(14vw); }
-}
-/* the sprite faces left, so it is mirrored on the way out */
-@keyframes cow-flip {
-  0% { transform: scaleX(-1); }
-  50% { transform: scaleX(1); }
-  100% { transform: scaleX(-1); }
-}
-@keyframes cow-hop {
-  0% { transform: translateY(0); }
-  100% { transform: translateY(-4px); }
-}
-
 /* ---------- menu bar ----------------------------------------------------- */
 
 .menubar {
@@ -294,6 +194,24 @@ html.is-arranging li:not(.is-held) .dicon .dicon-art { transform: none; }
   from { rotate: -2.2deg; }
   to { rotate: 2.2deg; }
 }
+
+/* selected: by dragging a box over the wallpaper, or a click with Shift/Ctrl/Cmd */
+.icons > .is-selected .dicon { background: rgba(47, 40, 35, 0.24); }
+.icons > .is-selected .dicon-label { background: var(--moored); color: var(--ink); text-shadow: none; }
+.marquee {
+  position: fixed; z-index: 3; pointer-events: none;
+  border: 3px solid var(--cream); background: rgba(240, 236, 228, 0.2);
+}
+
+/* the menu on a secondary click (src/scripts/contextmenu.ts) */
+.ctx {
+  position: fixed; z-index: 600; top: 0; left: 0; min-width: 208px;
+  font: 500 18px/1 var(--font-pixel);
+}
+.ctx:focus { outline: none; }
+.ctx .menu-row:disabled { color: var(--tin); background: none; cursor: default; }
+.ctx-tick { width: 8px; height: 8px; flex-shrink: 0; }
+.ctx [aria-checked='true'] .ctx-tick { background: currentColor; }
 
 /* app icon: a real icon in a pixel frame */
 .appicon {
@@ -487,6 +405,28 @@ html:not(.js) .shots-nav { display: none; }
 .empty h2 { font-size: 28px; }
 .empty p { margin: 0; color: var(--muted); }
 
+/* ---------- settings ----------------------------------------------------- */
+
+.settings h2 { font-size: 26px; margin: 0 0 8px; }
+.settings h2:not(:first-of-type) { margin-top: 30px; }
+.settings .settings-hint { margin: 0 0 14px; color: var(--muted); }
+.wallgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
+.wallpick {
+  display: grid; gap: 6px; align-content: start; padding: 8px 8px 10px; text-align: left; cursor: pointer;
+  font: inherit; color: var(--ink); background: var(--cream); border: 3px solid var(--line);
+}
+.wallpick:hover { border-color: var(--ink); }
+.wallpick[aria-pressed='true'] { border-color: var(--ink); background: #fff; box-shadow: 4px 4px 0 var(--moored); }
+.wallthumb { display: block; aspect-ratio: 16 / 10; border: 3px solid var(--ink); }
+.wallname { font: 600 20px/1 var(--font-pixel); }
+.wallblurb { font-size: 15px; line-height: 1.2; color: var(--muted); }
+.switch { display: flex; align-items: center; gap: 12px; cursor: pointer; }
+.switch input {
+  appearance: none; -webkit-appearance: none; flex-shrink: 0; width: 24px; height: 24px; margin: 0; cursor: pointer;
+  background: #fff; border: 3px solid var(--ink);
+}
+.switch input:checked { background: var(--moored); box-shadow: inset 0 0 0 3px #fff; }
+
 /* ---------- narrower windows --------------------------------------------- */
 
 @container win (max-width: 680px) {
@@ -534,13 +474,10 @@ html:not(.js) .menubar { position: sticky; }
 html:not(.js) .menu-panel { display: none; }
 html:not(.js) .windows { display: grid; gap: 24px; max-width: 900px; margin: 0 auto; padding: 24px 12px 48px; }
 html:not(.js) .snowcut { display: none; }
+html:not(.js) #settings { display: none; } /* nothing in it works without scripts */
 
 @media (prefers-reduced-motion: reduce) {
-  .cloud, .cow-walker, .cow-flip, .cow img, .scene img, html.js .win.is-opening { animation: none; }
-  .cow-walker { transform: translateX(62vw); }
-  .cloud-1 { transform: translateX(12vw); }
-  .cloud-2 { transform: translateX(58vw); }
-  .cloud-3 { transform: translateX(34vw); }
+  .scene img, html.js .win.is-opening { animation: none; }
   .btn, .dicon-art { transition: none; }
   /* No wiggle: a still tilt says "you can move these" instead. */
   html.is-arranging .dicon { animation: none; rotate: -2deg; }
