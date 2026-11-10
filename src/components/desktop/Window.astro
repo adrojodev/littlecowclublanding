@@ -1,0 +1,35 @@
+---
+// One desktop window. Its content is ordinary HTML in the page, so it is
+// readable without JavaScript; the script in src/scripts/desktop.ts turns
+// it into something you can open, drag, resize and close.
+interface Props {
+  id: string;
+  title: string;
+  width: number;
+  height: number;
+  /** No padding and no document type: the content is an app. */
+  flush?: boolean;
+}
+
+const { id, title, width, height, flush = false } = Astro.props;
+---
+
+<section class="win" id={id} data-win data-w={width} data-h={height} aria-labelledby={`${id}-title`} tabindex="-1">
+  <header class="win-bar" data-drag>
+    <span class="win-bar-icon"><slot name="icon" /></span>
+    <span class="win-title" id={`${id}-title`}>{title}</span>
+    <span class="win-bar-grip" aria-hidden="true"></span>
+    <div class="win-controls">
+      <button type="button" class="win-btn" data-win-max aria-label={`Maximize ${title}`}>
+        <svg viewBox="0 0 10 10" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M0 0h10v10H0zM2 3v5h6V3z" fill-rule="evenodd"></path></svg>
+      </button>
+      <button type="button" class="win-btn win-btn-close" data-win-close aria-label={`Close ${title}`}>
+        <svg viewBox="0 0 10 10" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M0 0h2v2H0zM2 2h2v2H2zM4 4h2v2H4zM6 6h2v2H6zM8 8h2v2H8zM8 0h2v2H8zM6 2h2v2H6zM2 6h2v2H2zM0 8h2v2H0z"></path></svg>
+      </button>
+    </div>
+  </header>
+  <div class:list={['win-body', { 'is-flush': flush }]}>
+    <slot />
+  </div>
+  <span class="win-resize" data-resize aria-hidden="true"></span>
+</section>

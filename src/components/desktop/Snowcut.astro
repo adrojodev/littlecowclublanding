@@ -1,0 +1,295 @@
+---
+// Snowcut — the paper snowflake maker — running live inside its window.
+// Markup mirrors the standalone app; behaviour lives in src/apps/snowcut.
+import '@fontsource-variable/archivo';
+---
+
+<div class="snowcut" data-snowcut>
+  <div class="sc-app">
+    <header class="sc-topbar">
+      <div class="sc-brand">
+        <span class="sc-brand-mark" aria-hidden="true">
+          <svg width="22" height="22" viewBox="-12 -12 24 24" stroke="#fff" stroke-width="2" stroke-linecap="square">
+            <line x1="0" y1="-9" x2="0" y2="9"></line><line x1="-9" y1="0" x2="9" y2="0"></line>
+            <line x1="-6.4" y1="-6.4" x2="6.4" y2="6.4"></line><line x1="-6.4" y1="6.4" x2="6.4" y2="-6.4"></line>
+          </svg>
+        </span>
+        <span class="sc-brand-name">SNOWCUT</span>
+      </div>
+      <div class="sc-topbar-actions">
+        <div class="sc-toggle sc-lang" role="group" aria-label="Language">
+          <button type="button" data-sc="lang-en" class="sc-toggle-btn">EN</button>
+          <button type="button" data-sc="lang-es" class="sc-toggle-btn">ES</button>
+        </div>
+        <label class="sc-paper">
+          <span data-i18n="paperLabel">Paper:</span>
+          <select data-sc="paper">
+            <option value="letter" selected>Letter</option>
+            <option value="a4">A4</option>
+          </select>
+        </label>
+        <button type="button" data-sc="print" class="sc-btn sc-btn-yellow">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><path d="M6 9V3h12v6"></path><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><path d="M6 14h12v7H6z"></path></svg>
+          <span data-i18n="printPdf">PRINT PDF</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="sc-workspace">
+      <section class="sc-panel sc-panel-pattern">
+        <div class="sc-panel-inner">
+          <div class="sc-panel-head">
+            <h3 class="sc-panel-label" data-i18n="pattern">PATTERN</h3>
+            <div class="sc-tools" role="toolbar" aria-label="Drawing tools">
+              <button type="button" data-sc="tool-draw" class="sc-tool active" title="Draw" aria-label="Draw" data-i18n-title="toolDraw">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path></svg>
+              </button>
+              <button type="button" data-sc="tool-erase" class="sc-tool" title="Erase" aria-label="Erase" data-i18n-title="toolErase">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><path d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21"></path><path d="M22 21H7"></path></svg>
+              </button>
+              <button type="button" data-sc="tool-undo" class="sc-tool" title="Undo" aria-label="Undo" data-i18n-title="toolUndo">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><path d="M3 7v6h6"></path><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"></path></svg>
+              </button>
+              <button type="button" data-sc="tool-clear" class="sc-tool" title="Clear all" aria-label="Clear all" data-i18n-title="toolClear">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+              </button>
+            </div>
+          </div>
+          <div class="sc-square sc-editor-wrap">
+            <svg data-sc="editor" class="sc-editor" viewBox="-14 -116 132 132" role="img" aria-label="Folded paper wedge — draw cut shapes here">
+              <path d="M0 0 L0 -100 L100 -100 Z" fill="#ffffff" stroke="#1a1c20" stroke-width="1.4" stroke-linejoin="miter"></path>
+              <line x1="0" y1="0" x2="0" y2="-100" stroke="#9aa0a8" stroke-width="1" stroke-dasharray="3 3"></line>
+              <line x1="0" y1="0" x2="100" y2="-100" stroke="#9aa0a8" stroke-width="1" stroke-dasharray="3 3"></line>
+              <g data-sc="shapes"></g>
+              <path data-sc="stroke-preview" fill="rgba(208,16,18,0.4)" stroke="#d01012" stroke-width="0.8"></path>
+            </svg>
+          </div>
+          <div class="sc-pattern-actions">
+            <button type="button" data-sc="random" class="sc-btn sc-btn-blue">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><rect x="3" y="3" width="18" height="18"></rect><circle cx="8.5" cy="8.5" r="1.4" fill="currentColor" stroke="none"></circle><circle cx="15.5" cy="15.5" r="1.4" fill="currentColor" stroke="none"></circle><circle cx="15.5" cy="8.5" r="1.4" fill="currentColor" stroke="none"></circle><circle cx="8.5" cy="15.5" r="1.4" fill="currentColor" stroke="none"></circle></svg>
+              <span data-i18n="randomPattern">RANDOM PATTERN</span>
+            </button>
+            <span class="sc-hint" data-i18n="drawHint">or draw your own shapes on the folded paper</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="sc-panel sc-panel-preview">
+        <div class="sc-panel-inner">
+          <div class="sc-panel-head">
+            <h3 class="sc-panel-label" data-i18n="preview">PREVIEW</h3>
+            <div class="sc-toggle" role="group" aria-label="Preview visibility">
+              <button type="button" data-sc="show" class="sc-toggle-btn" data-i18n="show">SHOW</button>
+              <button type="button" data-sc="hide" class="sc-toggle-btn active" data-i18n="hide">HIDE</button>
+            </div>
+          </div>
+          <div class="sc-square sc-preview-box">
+            <div data-sc="preview-hidden" class="sc-preview-hidden">
+              <svg viewBox="-46 -132 92 142" width="72" aria-hidden="true">
+                <path d="M0 0 L34 -122 L-34 -122 Z" fill="#ffffff" opacity="0.25"></path>
+              </svg>
+              <div class="sc-q">?</div>
+              <p data-i18n-html="secretText">Your snowflake is a secret.<br />Cut it to find out!</p>
+            </div>
+            <svg data-sc="preview-svg" class="sc-preview-svg is-hidden" viewBox="-112 -112 224 224" role="img" aria-label="Unfolded snowflake preview">
+              <defs>
+                <mask id="sc-holes-mask">
+                  <rect x="-104" y="-104" width="208" height="208" fill="#fff"></rect>
+                  <g data-sc="holes" fill="#000"></g>
+                </mask>
+              </defs>
+              <rect x="-100" y="-100" width="200" height="200" fill="#ffffff" rx="3" mask="url(#sc-holes-mask)"></rect>
+            </svg>
+          </div>
+          <p class="sc-hint sc-preview-hint" data-sc="preview-hint">Tap SHOW if you want to peek before cutting.</p>
+        </div>
+      </section>
+    </div>
+
+    <footer class="sc-steps">
+      <div class="sc-step"><span class="sc-step-n sc-n-red">1</span><span data-i18n="step1">Print the sheet</span></div>
+      <div class="sc-step"><span class="sc-step-n sc-n-yellow">2</span><span data-i18n="step2">Fold 3 times</span></div>
+      <div class="sc-step"><span class="sc-step-n sc-n-blue">3</span><span data-i18n="step3">Cut out the shapes</span></div>
+      <div class="sc-step"><span class="sc-step-n sc-n-black">4</span><span data-i18n="step4">Unfold your snowflake</span></div>
+    </footer>
+  </div>
+
+  <dialog data-sc="modal" class="sc-modal">
+    <div class="sc-modal-icon" aria-hidden="true">?</div>
+    <h3 data-i18n="modalTitle">Reveal the secret?</h3>
+    <p data-i18n="modalBody">The best part is unfolding the paper and seeing your snowflake for the very first time. Are you sure you want to peek?</p>
+    <div class="sc-modal-actions">
+      <button type="button" data-sc="modal-keep" class="sc-btn sc-btn-black" data-i18n="modalKeep">KEEP IT SECRET</button>
+      <button type="button" data-sc="modal-show" class="sc-btn sc-btn-outline" data-i18n="modalShow">SHOW ME ANYWAY</button>
+    </div>
+  </dialog>
+</div>
+
+<style is:global>
+  /* Snowcut keeps its own identity inside the window: Archivo, flat
+     primaries, 2px ink rules. Everything is prefixed so it stays put. */
+  .snowcut {
+    --sc-ink: #1a1c20;
+    --sc-muted: #6a6e76;
+    --sc-red: #d01012;
+    --sc-yellow: #ffcf00;
+    --sc-blue: #006db7;
+    --sc-soft: #f2f3f5;
+    container: snowcut / size;
+    height: 100%;
+    min-height: 520px;
+    font-family: 'Archivo Variable', 'Helvetica Neue', Arial, sans-serif;
+    color: var(--sc-ink);
+    background: #fff;
+  }
+  .snowcut *, .snowcut *::before, .snowcut *::after { box-sizing: border-box; }
+  .snowcut button { font-family: inherit; }
+  .snowcut :is(button, select):focus-visible { outline: 3px solid var(--sc-blue); outline-offset: 2px; }
+
+  .sc-app { height: 100%; display: flex; flex-direction: column; background: #fff; }
+
+  .sc-topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; padding: 0 22px; height: 60px; flex-shrink: 0;
+    border-bottom: 2px solid var(--sc-ink);
+  }
+  .sc-brand { display: flex; align-items: center; gap: 12px; }
+  .sc-brand-mark {
+    width: 36px; height: 36px; background: var(--sc-red); border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .sc-brand-name { font-size: 20px; font-weight: 900; letter-spacing: 0.04em; }
+  .sc-topbar-actions { display: flex; align-items: center; gap: 10px; }
+
+  .sc-paper {
+    display: flex; align-items: center; gap: 8px;
+    border: 2px solid var(--sc-ink); border-radius: 8px;
+    padding: 6px 10px; font-size: 13px; font-weight: 700;
+  }
+  .sc-paper select {
+    font: inherit; font-weight: 900; border: none; background: none;
+    color: var(--sc-ink); cursor: pointer; padding: 0 2px;
+  }
+
+  .sc-btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+    border: none; border-radius: 8px; padding: 11px 18px;
+    font-size: 14px; font-weight: 900; letter-spacing: 0.03em; white-space: nowrap;
+    cursor: pointer; color: var(--sc-ink);
+    transition: transform 0.06s ease, filter 0.12s ease;
+  }
+  .sc-btn:active { transform: translateY(1px); }
+  .sc-btn:hover { filter: brightness(1.06); }
+  .sc-btn:disabled { opacity: 0.6; cursor: progress; }
+  .sc-btn-yellow { background: var(--sc-yellow); }
+  .sc-btn-blue { background: var(--sc-blue); color: #fff; }
+  .sc-btn-black { background: var(--sc-ink); color: #fff; }
+  .sc-btn-outline { background: #fff; border: 2px solid var(--sc-ink); padding: 9px 18px; }
+
+  .sc-workspace { display: flex; flex: 1 1 auto; min-height: 0; }
+  .sc-panel { display: flex; flex-direction: column; flex: 1 1 0; min-width: 0; padding: 18px 22px; }
+  .sc-panel-pattern { border-right: 2px solid var(--sc-ink); }
+  .sc-panel-inner {
+    width: 100%; max-width: 560px; margin: 0 auto; flex-grow: 1;
+    display: flex; flex-direction: column; justify-content: space-between;
+  }
+  .sc-panel-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .sc-panel-label { margin: 0; font-size: 12px; font-weight: 900; letter-spacing: 0.12em; color: var(--sc-muted); }
+
+  .sc-tools { display: flex; gap: 8px; }
+  .sc-tool {
+    width: 36px; height: 36px; border: 2px solid var(--sc-ink); border-radius: 8px;
+    background: #fff; color: var(--sc-ink); cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .sc-tool.active { background: var(--sc-ink); color: #fff; }
+
+  /* Both squares size themselves from the window: as tall as the space
+     left under the app chrome, never wider than their column. */
+  .sc-square {
+    aspect-ratio: 1 / 1;
+    width: clamp(180px, min(100%, calc(100cqh - 292px)), 520px);
+    border-radius: 12px; margin: 14px auto 0; position: relative;
+  }
+  .sc-editor-wrap { background: var(--sc-soft); }
+  .sc-editor { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; cursor: crosshair; }
+  .sc-editor.erase-mode { cursor: pointer; }
+  .sc-editor .sc-shape { fill: var(--sc-red); }
+  .sc-editor.erase-mode .sc-shape:hover { fill: #8f0b0d; }
+
+  .sc-pattern-actions { display: flex; align-items: center; gap: 12px; margin-top: 14px; flex-wrap: wrap; min-height: 44px; }
+  .sc-hint { font-size: 13px; font-weight: 500; color: var(--sc-muted); margin: 0; line-height: 1.35; }
+
+  .sc-preview-box {
+    background: var(--sc-blue); padding: 20px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .sc-preview-hidden { display: flex; flex-direction: column; align-items: center; gap: 10px; color: #fff; text-align: center; }
+  .sc-preview-hidden .sc-q { font-size: 34px; font-weight: 900; line-height: 1; }
+  .sc-preview-hidden p { font-size: 14px; font-weight: 700; margin: 0; max-width: 220px; line-height: 1.35; }
+  .sc-preview-svg { width: 100%; max-width: 300px; height: auto; }
+  .sc-preview-svg.is-hidden, .sc-preview-hidden.is-hidden { display: none; }
+  .sc-preview-hint { margin-top: 14px; min-height: 44px; display: flex; align-items: center; }
+
+  .sc-toggle { display: flex; border: 2px solid var(--sc-ink); border-radius: 8px; overflow: hidden; }
+  .sc-toggle-btn {
+    border: none; background: #fff; color: var(--sc-ink); cursor: pointer;
+    font-size: 12px; font-weight: 900; letter-spacing: 0.04em; padding: 7px 13px;
+  }
+  .sc-toggle-btn.active { background: var(--sc-ink); color: #fff; }
+
+  .sc-steps { display: flex; flex-shrink: 0; border-top: 2px solid var(--sc-ink); }
+  .sc-step {
+    flex: 1 1 0; display: flex; align-items: center; gap: 10px;
+    padding: 14px 22px; font-size: 13px; font-weight: 700; line-height: 1.25;
+    border-right: 2px solid var(--sc-ink);
+  }
+  .sc-step:last-child { border-right: none; }
+  .sc-step-n {
+    width: 26px; height: 26px; border-radius: 6px; color: #fff; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 900;
+  }
+  .sc-n-red { background: var(--sc-red); }
+  .sc-n-yellow { background: var(--sc-yellow); color: var(--sc-ink); }
+  .sc-n-blue { background: var(--sc-blue); }
+  .sc-n-black { background: var(--sc-ink); }
+
+  .sc-modal {
+    border: none; border-radius: 16px; padding: 32px; margin: auto;
+    width: min(430px, calc(100vw - 40px)); text-align: center;
+    font-family: inherit; color: var(--sc-ink); background: #fff;
+  }
+  .sc-modal::backdrop { background: rgba(14, 15, 18, 0.55); }
+  .sc-modal-icon {
+    width: 64px; height: 64px; background: var(--sc-blue); border-radius: 14px; color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 34px; font-weight: 900; margin: 0 auto 16px;
+  }
+  .sc-modal h3 { font-size: 26px; font-weight: 900; margin: 0 0 12px; line-height: 1.15; }
+  .sc-modal p { font-size: 15px; font-weight: 500; color: #4a4e56; line-height: 1.5; margin: 0 auto 20px; max-width: 330px; }
+  .sc-modal-actions { display: flex; flex-direction: column; gap: 10px; }
+  .sc-modal-actions .sc-btn { width: 100%; }
+
+  /* Narrow window: stack the two panels and let the window scroll. */
+  @container snowcut (max-width: 720px) {
+    .sc-app { height: auto; min-height: 100%; }
+    .sc-topbar { padding: 0 14px; }
+    .sc-topbar-actions { gap: 8px; }
+    .sc-brand-name { display: none; }
+    .sc-btn { padding: 11px 13px; font-size: 13px; gap: 8px; }
+    .sc-workspace { flex-direction: column; flex: none; }
+    .sc-panel { flex: none; padding: 16px 14px; }
+    .sc-panel-pattern { border-right: none; border-bottom: 2px solid var(--sc-ink); }
+    .sc-square { width: min(100%, 420px); }
+    .sc-steps { flex-wrap: wrap; }
+    .sc-step { flex: 1 1 50%; padding: 12px 14px; border-bottom: 2px solid var(--sc-ink); }
+    .sc-step:nth-child(n + 3) { border-bottom: none; }
+    .sc-step:nth-child(2n) { border-right: none; }
+  }
+  @container snowcut (max-width: 440px) {
+    .sc-paper { padding: 6px 8px; font-size: 12px; }
+    .sc-paper [data-i18n='paperLabel'] { display: none; }
+    .sc-topbar .sc-btn { padding: 10px; font-size: 12px; gap: 6px; }
+    .sc-lang .sc-toggle-btn { padding: 7px 9px; font-size: 11px; }
+  }
+</style>

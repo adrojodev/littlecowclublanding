@@ -1,41 +1,35 @@
 ---
 import '@fontsource-variable/pixelify-sans';
+import '@fontsource-variable/work-sans';
+import '../styles/desktop.css';
 
 interface Props {
 	title: string;
+	description: string;
 }
 
-const { title } = Astro.props;
+const { title, description } = Astro.props;
 ---
 
 <!doctype html>
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
-		<meta name="description" content="Astro description" />
-		<meta name="viewport" content="width=device-width" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+		<meta name="description" content={description} />
+		<meta name="theme-color" content="#07a2ea" />
+		<meta property="og:title" content="Little Cow Club" />
+		<meta property="og:description" content={description} />
+		<meta property="og:type" content="website" />
 		<link rel="icon" type="image/png" href="/favicon.png" />
 		<meta name="generator" content={Astro.generator} />
 		<title>{title}</title>
+		<!-- Windows only behave like windows once scripts run; until then the page is a plain document. -->
+		<script is:inline>
+			document.documentElement.classList.add('js');
+		</script>
 	</head>
-	<body class="text-cowhite">
+	<body>
 		<slot />
 	</body>
 </html>
-<style is:global>
-	:root {
-		--accent: 136, 58, 234;
-		--accent-light: 224, 204, 250;
-		--accent-dark: 49, 10, 101;
-		--accent-gradient: linear-gradient(
-			45deg,
-			rgb(var(--accent)),
-			rgb(var(--accent-light)) 30%,
-			white 60%
-		);
-	}
-	html {
-		font-family: 'Pixelify Sans Variable', system-ui;
-		background: #07a2ea;
-	}
-</style>

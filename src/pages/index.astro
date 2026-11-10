@@ -2,22 +2,341 @@
 import { Image } from 'astro:assets';
 
 import Layout from '../layouts/Layout.astro';
+import Window from '../components/desktop/Window.astro';
+import AppIcon from '../components/desktop/AppIcon.astro';
+import PixelArt from '../components/desktop/PixelArt.astro';
+import Snowcut from '../components/desktop/Snowcut.astro';
+import { projects, snowcut, contact } from '../data/projects';
+import rojo from '../assets/rojo.png';
+
+const herdCount = projects.length + 1;
+const description =
+	'Little Cow Club is where Rojo makes small, friendly software: Mini Briefs, Dine, Happy Places, Keep it short and a paper snowflake maker you can use right here.';
 ---
 
-<Layout title="Moooooooooooooooooooooooooooooooooooo">
-	<main class="grid grid-rows-4 justify-center items-center min-h-screen w-full">
-		<section class="flex flex-col text-center row-span-3 items-center justify-center gap-4 flex-1">
-			<div class="flex flex-col gap-0 md:gap-2">
-				<h1 class="md:text-9xl text-7xl font-black">Little Cow</h1>
-				<h2 class="md:text-6xl text-4xl font-bold text-cown">Club</h2>
+<Layout title="Little Cow Club — Moooooooooooooooooooo" description={description}>
+	<!-- ============ wallpaper ============ -->
+	<div class="wallpaper" aria-hidden="true">
+		<div class="cloud cloud-1"><PixelArt name="cloud" /></div>
+		<div class="cloud cloud-2"><PixelArt name="cloudSmall" /></div>
+		<div class="cloud cloud-3"><PixelArt name="cloud" /></div>
+		<div class="pasture">
+			<span class="sprite" style="left:6%;top:26%;height:20px"><PixelArt name="flower" /></span>
+			<span class="sprite" style="left:19%;top:58%;height:12px"><PixelArt name="tuft" /></span>
+			<span class="sprite" style="left:31%;top:22%;height:12px"><PixelArt name="tuft" /></span>
+			<span class="sprite" style="left:44%;top:52%;height:20px"><PixelArt name="flowerRed" /></span>
+			<span class="sprite" style="left:58%;top:30%;height:12px"><PixelArt name="tuft" /></span>
+			<span class="sprite" style="left:69%;top:62%;height:20px"><PixelArt name="flower" /></span>
+			<span class="sprite" style="left:81%;top:24%;height:20px"><PixelArt name="flowerRed" /></span>
+			<span class="sprite" style="left:92%;top:54%;height:12px"><PixelArt name="tuft" /></span>
+		</div>
+	</div>
+
+	<div class="cow-walker" data-cow-walker>
+		<button type="button" class="cow" data-moo aria-label="Pet the cow">
+			<span class="cow-bubble" data-cow-bubble hidden>Moo!</span>
+			<span class="cow-flip"><img src="/assets/cow.png" alt="" width="96" height="60" /></span>
+		</button>
+	</div>
+
+	<!-- ============ menu bar ============ -->
+	<header class="menubar">
+		<nav class="menubar-nav" aria-label="Main">
+			<div class="menu" data-menu>
+				<button type="button" class="menubar-item menubar-logo" data-menu-button aria-expanded="false" aria-controls="menu-club">
+					<img src="/assets/cow.png" alt="" width="30" height="19" />
+					<span>Little Cow Club</span>
+				</button>
+				<div class="menu-panel" id="menu-club" data-menu-panel hidden>
+					<a class="menu-row" href="#home" data-open="home">Home</a>
+					<a class="menu-row" href="#about" data-open="about">About the club</a>
+					<a class="menu-row" href="#contact" data-open="contact">Contact</a>
+					<hr class="menu-sep" />
+					<a class="menu-row" href="/privacy/webmarks">Webmarks privacy</a>
+					<hr class="menu-sep" />
+					<button type="button" class="menu-row" data-moo>Moo</button>
+				</div>
 			</div>
-			<div class="relative w-full ">
-				<a href="mailto:ad_rojo@outlook.com" class="bg-moored absolute inset-x-0 mx-auto w-fit px-4 py-2 border-b-8 border-moored-shadow hover:border-b-4 hover:translate-y-1 active:translate-y-1.5 active:border-b-0">Contact us!</a>
+
+			<div class="menu" data-menu>
+				<button type="button" class="menubar-item" data-menu-button aria-expanded="false" aria-controls="menu-projects">
+					<span>Projects</span>
+					<svg class="menubar-caret" viewBox="0 0 8 6" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M0 0h8v2H0zM1 2h6v2H1zM3 4h2v2H3z"></path></svg>
+				</button>
+				<div class="menu-panel menu-panel-wide" id="menu-projects" data-menu-panel hidden>
+					<span class="menu-label">The herd</span>
+					{
+						projects.map((p) => (
+							<a class="menu-row" href={`#${p.id}`} data-open={p.id}>
+								<span class="dicon-art" style="width:34px;height:34px;flex-shrink:0"><AppIcon image={p.icon} size={34} /></span>
+								<span>
+									{p.name}
+									<small>{p.short}</small>
+								</span>
+							</a>
+						))
+					}
+					<a class="menu-row" href={`#${snowcut.id}`} data-open={snowcut.id}>
+						<span class="dicon-art" style="width:34px;height:34px;flex-shrink:0"><AppIcon snowcut /></span>
+						<span>
+							{snowcut.name}
+							<small>{snowcut.short}</small>
+						</span>
+					</a>
+				</div>
 			</div>
-		</section>
-		<section class="w-screen h-full row-span-1 bg-green-400 flex justify-center items-start relative">
-			<Image src="/assets/cow.png" alt="" width={100} height={100} class="animate-bounce absolute -top-8" />
-		</section>
+
+			<a class="menubar-item menubar-hide-sm" href="#about" data-open="about">About</a>
+			<a class="menubar-item menubar-hide-sm" href="#contact" data-open="contact">Contact</a>
+		</nav>
+
+		<div class="menubar-right">
+			<time class="menubar-clock menubar-hide-sm" data-clock></time>
+			<a class="btn btn-sm" href="#contact" data-open="contact">Contact us!</a>
+		</div>
+	</header>
+
+	<!-- ============ desktop icons ============ -->
+	<nav aria-label="Desktop">
+		<ul class="icons icons-left">
+			<li>
+				<a class="dicon" href="#home" data-open="home">
+					<span class="dicon-art"><AppIcon sprite="barn" /></span>
+					<span class="dicon-label">Home</span>
+				</a>
+			</li>
+			{
+				projects.map((p) => (
+					<li>
+						<a class="dicon" href={`#${p.id}`} data-open={p.id}>
+							<span class="dicon-art"><AppIcon image={p.icon} /></span>
+							<span class="dicon-label">{p.name}</span>
+						</a>
+					</li>
+				))
+			}
+			<li>
+				<a class="dicon" href={`#${snowcut.id}`} data-open={snowcut.id}>
+					<span class="dicon-art"><AppIcon snowcut /></span>
+					<span class="dicon-label">{snowcut.name}</span>
+				</a>
+			</li>
+		</ul>
+		<ul class="icons icons-right">
+			<li>
+				<a class="dicon" href="#about" data-open="about">
+					<span class="dicon-art"><AppIcon sprite="cowface" /></span>
+					<span class="dicon-label">About</span>
+				</a>
+			</li>
+			<li>
+				<a class="dicon" href="#contact" data-open="contact">
+					<span class="dicon-art"><AppIcon sprite="letter" /></span>
+					<span class="dicon-label">Contact</span>
+				</a>
+			</li>
+			<li>
+				<a class="dicon" href="#trash" data-open="trash">
+					<span class="dicon-art"><AppIcon sprite="pail" /></span>
+					<span class="dicon-label">Trash</span>
+				</a>
+			</li>
+		</ul>
+	</nav>
+
+	<!-- ============ windows ============ -->
+	<main class="windows" data-windows>
+		<Window id="home" title="Home" width={900} height={720}>
+			<AppIcon slot="icon" sprite="barn" />
+			<div class="doc">
+				<div class="home-hero">
+					<div>
+						<span class="eyebrow">A very small software club</span>
+						<h1 class="home-title">Little Cow <span>Club</span></h1>
+						<p class="home-lede">Where Rojo makes small, friendly software. Some of it is for the news, some for money, and one of them cuts snowflakes.</p>
+						<div class="actions">
+							<a class="btn" href="#contact" data-open="contact">Contact us!</a>
+							<a class="btn btn-quiet" href="#about" data-open="about">About the club</a>
+						</div>
+					</div>
+					<div class="scene" aria-hidden="true">
+						<span class="sprite sprite-a"><PixelArt name="cloud" /></span>
+						<span class="sprite sprite-b"><PixelArt name="cloudSmall" /></span>
+						<span class="sprite sprite-c"><PixelArt name="flower" /></span>
+						<span class="sprite sprite-d"><PixelArt name="flowerRed" /></span>
+						<img src="/assets/cow.png" alt="" width="120" height="76" />
+					</div>
+				</div>
+
+				<hr class="rule" />
+
+				<div class="herd-head">
+					<h2>The herd</h2>
+					<span>{herdCount} projects</span>
+				</div>
+				<ul class="herd">
+					{
+						projects.map((p) => (
+							<li>
+								<a class="herd-card" href={`#${p.id}`} data-open={p.id}>
+									<span class="dicon-art"><AppIcon image={p.icon} /></span>
+									<span class="herd-name">{p.name} <span class="chip">{p.platform}</span></span>
+									<span class="herd-short">{p.short}</span>
+								</a>
+							</li>
+						))
+					}
+					<li>
+						<a class="herd-card" href={`#${snowcut.id}`} data-open={snowcut.id}>
+							<span class="dicon-art"><AppIcon snowcut /></span>
+							<span class="herd-name">{snowcut.name} <span class="chip chip-live">Try it here</span></span>
+							<span class="herd-short">{snowcut.short}</span>
+						</a>
+					</li>
+				</ul>
+
+				<hr class="rule" />
+
+				<div class="home-foot">
+					<span>© {new Date().getFullYear()} Little Cow Club · Mexico City</span>
+					<a class="textlink" href={contact.portfolio} target="_blank" rel="noopener">Rojo’s portfolio</a>
+				</div>
+			</div>
+		</Window>
+
+		{
+			projects.map((p) => (
+				<Window id={p.id} title={p.name} width={p.shotShape === 'wide' ? 640 : 880} height={640}>
+					<AppIcon slot="icon" image={p.icon} size={20} />
+					<article class:list={['doc', 'proj', { 'proj-wide': p.shotShape === 'wide' }]}>
+						<div>
+							<div class="proj-head">
+								<span class="dicon-art"><AppIcon image={p.icon} size={76} /></span>
+								<div>
+									<h2 class="proj-name">{p.name}</h2>
+									<p class="proj-tagline">{p.tagline}</p>
+								</div>
+							</div>
+							<ul class="chips">
+								<li class="chip">{p.platform}</li>
+								<li class="chip">{p.year}</li>
+								<li class="chip chip-live">{p.status}</li>
+							</ul>
+							<div class="actions">
+								{
+									p.links.map((link, i) => (
+										<a class:list={['btn', { 'btn-quiet': i > 0 }]} href={link.href} target="_blank" rel="noopener">
+											{link.label}
+											<svg class="ext" viewBox="0 0 5 5" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M1 0h4v1H1zM4 1h1v3H4zM3 1h1v1H3zM2 2h1v1H2zM1 3h1v1H1zM0 4h1v1H0z" /></svg>
+											<span class="sr-only">(opens in a new tab)</span>
+										</a>
+									))
+								}
+							</div>
+							{p.about.map((paragraph) => <p>{paragraph}</p>)}
+							<h3>What it does</h3>
+							<ul class="ticks">
+								{p.features.map((feature) => <li>{feature}</li>)}
+							</ul>
+						</div>
+						<div class="shots" data-shots>
+							<ul class="shots-track" data-shots-track tabindex={p.shots.length > 1 ? 0 : undefined} aria-label={`${p.name} screenshots`}>
+								{
+									p.shots.map((shot) => (
+										<li class="shot">
+											<Image src={shot.src} alt={shot.alt} width={p.shotShape === 'wide' ? 1160 : 480} loading="lazy" />
+										</li>
+									))
+								}
+							</ul>
+							{
+								p.shots.length > 1 && (
+									<div class="shots-nav">
+										<button type="button" class="win-btn" data-shots-prev aria-label="Previous screenshot">
+											<svg viewBox="0 0 6 10" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M4 0h2v2H4zM2 2h2v2H2zM0 4h2v2H0zM2 6h2v2H2zM4 8h2v2H4z" /></svg>
+										</button>
+										<span data-shots-count aria-live="polite">1 / {p.shots.length}</span>
+										<button type="button" class="win-btn" data-shots-next aria-label="Next screenshot">
+											<svg viewBox="0 0 6 10" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M0 0h2v2H0zM2 2h2v2H2zM4 4h2v2H4zM2 6h2v2H2zM0 8h2v2H0z" /></svg>
+										</button>
+									</div>
+								)
+							}
+							{p.note && <p class="proj-note">{p.note}</p>}
+						</div>
+					</article>
+				</Window>
+			))
+		}
+
+		<Window id={snowcut.id} title="Snowflakes — Snowcut" width={980} height={680} flush>
+			<AppIcon slot="icon" snowcut />
+			<Snowcut />
+			<noscript>
+				<div class="doc"><p>Snowcut is a paper snowflake maker. It needs JavaScript to run.</p></div>
+			</noscript>
+		</Window>
+
+		<Window id="about" title="About" width={600} height={590}>
+			<AppIcon slot="icon" sprite="cowface" />
+			<div class="doc">
+				<div class="desk">
+					<div class="desk-photo"><Image src={rojo} alt="Rojo’s Memoji, blowing a party horn" width={440} loading="lazy" /></div>
+					<div>
+						<span class="eyebrow">From the desk of</span>
+						<h2 class="desk-name">Rojo</h2>
+						<p class="desk-role">Software engineer &amp; product designer</p>
+					</div>
+				</div>
+				<hr class="rule" />
+				<p>Little Cow Club is the name on the door of the apps I make on my own. They give me room to explore ideas and experiment.</p>
+				<p>I set the product direction, work with AI coding agents on design and implementation, and keep reviewing and refining the result until it feels worth using.</p>
+				<p>I love a good interface: the typography, the interactions, and the small decisions that make a product feel right.</p>
+				<ul class="linklist">
+					<li><a class="btn" href={contact.portfolio} target="_blank" rel="noopener">See my portfolio</a></li>
+					<li><a class="btn btn-quiet" href={contact.github} target="_blank" rel="noopener">GitHub</a></li>
+					<li><a class="btn btn-quiet" href={contact.linkedin} target="_blank" rel="noopener">LinkedIn</a></li>
+					<li><a class="btn btn-quiet" href={contact.instagram} target="_blank" rel="noopener">Instagram</a></li>
+				</ul>
+			</div>
+		</Window>
+
+		<Window id="contact" title="New message" width={520} height={560}>
+			<AppIcon slot="icon" sprite="letter" />
+			<div class="doc">
+				<span class="eyebrow">Say moo</span>
+				<h2 style="font-size:32px;margin-bottom:18px">Something worth building together?</h2>
+				<form class="mail" action={`mailto:${contact.email}`} method="get" data-mail data-to={contact.email}>
+					<div class="mail-row">
+						<span class="mail-key">To</span>
+						<span class="mail-static">{contact.email}</span>
+					</div>
+					<div class="mail-row">
+						<label for="mail-subject">Subject</label>
+						<input id="mail-subject" name="subject" type="text" value="Moo" autocomplete="off" />
+					</div>
+					<label class="sr-only" for="mail-body">Message</label>
+					<textarea id="mail-body" name="body" placeholder="Tell us about it."></textarea>
+					<div class="actions">
+						<button type="submit" class="btn">Open in your mail app</button>
+						<button type="button" class="btn btn-quiet" data-copy={contact.email}>Copy address</button>
+					</div>
+					<p class="mail-hint">Nothing is sent from this page. The button opens a draft in your own mail app.</p>
+				</form>
+			</div>
+		</Window>
+
+		<Window id="trash" title="Trash" width={400} height={330}>
+			<AppIcon slot="icon" sprite="pail" />
+			<div class="empty">
+				<AppIcon sprite="pail" />
+				<h2 class="pixel">Trash is empty</h2>
+				<p>The cow eats everything.</p>
+			</div>
+		</Window>
 	</main>
 </Layout>
 
+<script>
+	import '../scripts/desktop.ts';
+</script>

@@ -1,0 +1,43 @@
+---
+// An icon in a pixel frame: either a project's real app icon, a pixel
+// sprite drawn for the desktop, or Snowcut's own mark.
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import PixelArt from './PixelArt.astro';
+import type { SpriteName } from '../../data/sprites';
+
+interface Props {
+  image?: { src: ImageMetadata; tile?: string; inset?: boolean };
+  sprite?: SpriteName;
+  snowcut?: boolean;
+  /** Rendered size in CSS pixels; images are generated at 2x. */
+  size?: number;
+}
+
+const { image, sprite, snowcut = false, size = 52 } = Astro.props;
+---
+
+{
+  image && (
+    <span class:list={['appicon', { 'is-inset': image.inset }]} style={image.tile ? `--tile:${image.tile}` : undefined}>
+      <Image src={image.src} alt="" width={size * 2} height={size * 2} loading="eager" />
+    </span>
+  )
+}
+{
+  sprite && (
+    <span class="appicon is-sprite">
+      <PixelArt name={sprite} />
+    </span>
+  )
+}
+{
+  snowcut && (
+    <span class="appicon" style="--tile:#d01012">
+      <svg viewBox="-16 -16 32 32" stroke="#fff" stroke-width="2.6" stroke-linecap="square" aria-hidden="true">
+        <line x1="0" y1="-10" x2="0" y2="10" /><line x1="-10" y1="0" x2="10" y2="0" />
+        <line x1="-7" y1="-7" x2="7" y2="7" /><line x1="-7" y1="7" x2="7" y2="-7" />
+      </svg>
+    </span>
+  )
+}
