@@ -4,6 +4,8 @@
 // Windows are plain <section data-win> elements already in the page. This
 // file only decides which are open, where they sit, and which is in front.
 
+import { initIcons } from './icons';
+
 interface Win {
   id: string;
   el: HTMLElement;
@@ -275,6 +277,15 @@ document.querySelectorAll('[data-moo]').forEach((el) =>
     moo();
   }),
 );
+
+// ---------- desktop icons: drag to move, hold to rearrange on phones --------
+
+const icons = initIcons(phone);
+
+document.querySelector('[data-icons-tidy]')?.addEventListener('click', () => {
+  setMenu(null);
+  icons.tidy();
+});
 
 // ---------- screenshot pagers ---------------------------------------------
 

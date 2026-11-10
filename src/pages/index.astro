@@ -53,6 +53,7 @@ const description =
 					<hr class="menu-sep" />
 					<a class="menu-row" href="/privacy/webmarks">Webmarks privacy</a>
 					<hr class="menu-sep" />
+					<button type="button" class="menu-row" data-icons-tidy>Tidy icons</button>
 					<button type="button" class="menu-row" data-moo>Moo</button>
 				</div>
 			</div>
@@ -93,49 +94,51 @@ const description =
 			<time class="menubar-clock menubar-hide-sm" data-clock></time>
 			<a class="btn btn-sm" href="#contact" data-open="contact">Contact us!</a>
 		</div>
+		<!-- Shown while the icons wiggle (phones: press and hold an icon). -->
+		<button type="button" class="btn btn-sm" data-icons-done hidden>Done</button>
 	</header>
 
 	<!-- ============ desktop icons ============ -->
 	<nav aria-label="Desktop">
-		<ul class="icons icons-left">
-			<li>
-				<a class="dicon" href="#home" data-open="home">
+		<ul class="icons icons-left" data-icons="left">
+			<li data-icon="home">
+				<a class="dicon" href="#home" data-open="home" draggable="false">
 					<span class="dicon-art"><AppIcon sprite="barn" /></span>
 					<span class="dicon-label">Home</span>
 				</a>
 			</li>
 			{
 				projects.map((p) => (
-					<li>
-						<a class="dicon" href={`#${p.id}`} data-open={p.id}>
+					<li data-icon={p.id}>
+						<a class="dicon" href={`#${p.id}`} data-open={p.id} draggable="false">
 							<span class="dicon-art"><AppIcon image={p.icon} /></span>
 							<span class="dicon-label">{p.name}</span>
 						</a>
 					</li>
 				))
 			}
-			<li>
-				<a class="dicon" href={`#${snowcut.id}`} data-open={snowcut.id}>
+			<li data-icon={snowcut.id}>
+				<a class="dicon" href={`#${snowcut.id}`} data-open={snowcut.id} draggable="false">
 					<span class="dicon-art"><AppIcon snowcut /></span>
 					<span class="dicon-label">{snowcut.name}</span>
 				</a>
 			</li>
 		</ul>
-		<ul class="icons icons-right">
-			<li>
-				<a class="dicon" href="#about" data-open="about">
+		<ul class="icons icons-right" data-icons="right">
+			<li data-icon="about">
+				<a class="dicon" href="#about" data-open="about" draggable="false">
 					<span class="dicon-art"><AppIcon sprite="cowface" /></span>
 					<span class="dicon-label">About</span>
 				</a>
 			</li>
-			<li>
-				<a class="dicon" href="#contact" data-open="contact">
+			<li data-icon="contact">
+				<a class="dicon" href="#contact" data-open="contact" draggable="false">
 					<span class="dicon-art"><AppIcon sprite="letter" /></span>
 					<span class="dicon-label">Contact</span>
 				</a>
 			</li>
-			<li>
-				<a class="dicon" href="#trash" data-open="trash">
+			<li data-icon="trash">
+				<a class="dicon" href="#trash" data-open="trash" draggable="false">
 					<span class="dicon-art"><AppIcon sprite="pail" /></span>
 					<span class="dicon-label">Trash</span>
 				</a>
